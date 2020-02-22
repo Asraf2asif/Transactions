@@ -83,13 +83,14 @@ def submit():
 
 if __name__ == "__main__":
     mainWindow = tkinter.Tk()
+    mainWindow.config(bg='#eaeaea')
     mainWindow.title("Transaction:-  EPK International (Pvt) Ltd.")
     mainWindow.geometry('1165x680+30+0')
 
 
 # Frame
-    input_frame = tkinter.Frame(mainWindow)
-    output_frame = tkinter.Frame(mainWindow)
+    input_frame = tkinter.Frame(mainWindow, bg='#eaeaea')
+    output_frame = tkinter.Frame(mainWindow, bg='#eaeaea')
 
 
 # Name
@@ -105,21 +106,21 @@ if __name__ == "__main__":
 
 
 # Element
-    input_button1 = [tkinter.Button(input_frame, text=name, width=10, height=1) for name in input1_name]
-    input_button2 = [tkinter.Button(input_frame, text=name, width=10, height=1) for name in input2_name]
+    input_button1 = [tkinter.Button(input_frame, text=name, width=10, height=1, bg='#71c9ce', fg='black') for name in input1_name]
+    input_button2 = [tkinter.Button(input_frame, text=name, width=10, height=1, bg='#71c9ce') for name in input2_name]
 
-    input_entry1 = [tkinter.Entry(input_frame, textvariable=name+"_var", **styleOpts1) for name in input1_name]
-    input_entry2 = [tkinter.Entry(input_frame, textvariable=name+"_var", **styleOpts1) for name in input2_name]
+    input_entry1 = [tkinter.Entry(input_frame, textvariable=name+"_var",  bg='#d3d4d8', **styleOpts1) for name in input1_name]
+    input_entry2 = [tkinter.Entry(input_frame, textvariable=name+"_var",  bg='#d3d4d8', **styleOpts1) for name in input2_name]
     
-    output_label1 = [tkinter.Label(output_frame, text=name, width=12,  anchor="w") for name in output1_name]
-    output_label2 = [tkinter.Label(output_frame, text=name, width=12,  anchor="w") for name in output2_name]
+    output_label1 = [tkinter.Label(output_frame, text=name, width=12,  anchor="w", bg='#ffa5a5') for name in output1_name]
+    output_label2 = [tkinter.Label(output_frame, text=name, width=12,  anchor="w", bg='#eab4f8') for name in output2_name]
     
-    output_value1 = [tkinter.Entry(output_frame, state='readonly', **styleOpts1) for name in output1_name]
+    output_value1 = [tkinter.Entry(output_frame, state='readonly', bg='#d3d4d8', **styleOpts1) for name in output1_name]
     output_value2 = [tkinter.Entry(output_frame, state='readonly', **styleOpts1) for name in output2_name]
 
         
     thousand_shorthand_var = tkinter.IntVar()
-    thousand_shorthand =  tkinter.Checkbutton(input_frame, text="(000)?", variable=thousand_shorthand_var)
+    thousand_shorthand =  tkinter.Checkbutton(input_frame, text="(000)?", variable=thousand_shorthand_var, bg='#4ecca3')
     placement(element=thousand_shorthand, row=4, column=1,  pady=(30,0))
     
 
@@ -127,8 +128,8 @@ if __name__ == "__main__":
     all_input = input_entry1 + input_entry2
     all_output = output_value1 + output_value2
     
-    output_value1[3].config(font='serif 8 bold')
-    output_value2[5].config(font='serif 8 bold')
+    output_value1[3].config(font='Helvetica 8 bold')
+    output_value2[5].config(font='Helvetica 8 bold')
     
 
 # Database
@@ -162,15 +163,15 @@ if __name__ == "__main__":
 
     
 # Balance Button & Value
-    balance_button = tkinter.Button(output_frame, text="Balance", width=11, anchor="w")
-    balance_value = tkinter.Entry(output_frame, width=12,  justify='center', font='serif 8 bold', state='readonly')
+    balance_button = tkinter.Button(output_frame, text="Balance", width=11, anchor="w", bg='#f3f798')
+    balance_value = tkinter.Entry(output_frame, width=12,  justify='center', font='Helvetica 8 bold', state='readonly')
     
     placement(element=balance_value, row=len(output1_name)+1, column=1,  pady=(10,0), ipady=4)
     placement(element=balance_button, row=len(output1_name)+1, column=0,  pady=(10,0), ipady=2)
 
     
 # Submit Button
-    submit_button = tkinter.Button(input_frame, text="Submit", width=10, height=1, command=submit)
+    submit_button = tkinter.Button(input_frame, text="Submit", width=10, height=1, command=submit, bg='#1891ac', fg='white')
     placement(element=submit_button, row=4, column=5,  pady=(30,0), ipady=2)
 
 
