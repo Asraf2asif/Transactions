@@ -132,7 +132,7 @@ if __name__ == "__main__":
     
 
 # Database
-    con=sqlite3.connect('Transactions.db')
+    con=sqlite3.connect('../Transactions.db')
     cur=con.cursor()
     cur.execute("""CREATE TABLE IF NOT EXISTS "Transaction" (
                             "ID" INTEGER PRIMARY KEY AUTOINCREMENT,
