@@ -6,6 +6,14 @@ from collections import Counter
 def placement(element, row=0, column=0,  sticky='nw', padx=(10,0), pady=(0,0), ipady=0, border=2, relief='groove'):
         element.grid(row=row, column=column, sticky=sticky, padx=padx, pady=pady, ipady=ipady)
         element.config(border=border, relief=relief)
+
+
+def placement_input_entry(el, row):
+        return placement(element=el, row=row, column=i,  pady=(10,0), ipady=2, relief='sunken')
+
+
+def placement_output_entry(el, column, padx=(10,0)):
+        return placement(element=el, row=i, column=column, padx=padx, pady=(0 if i==0 else 10,0), ipady=4)
         
 
 def insert_input():
@@ -100,6 +108,7 @@ if __name__ == "__main__":
     output2_name = [" R/P (C/D)", " T. Bill"," T. Loan: R.", " T. Loan: PCT", " T. Income V.", " Total (Comp.)"]
 
     styleOpts1 = { 'width' : 12,  'justify' : 'center' }
+    styleBold = { 'font' : 'Helvetica 8 bold'}
 
     input_regex = re.compile (r'^[-+]?[\d]*\.?[\d]+$')
 
@@ -129,8 +138,8 @@ if __name__ == "__main__":
     output_name = output1_name + output2_name
     output_value = output_value1 + output_value2
     
-    output_value1[3].config(font='Helvetica 8 bold')
-    output_value2[5].config(font='Helvetica 8 bold')
+    output_value1[3].config(**styleBold)
+    output_value2[5].config(**styleBold)
     
 
 # Database
@@ -146,26 +155,27 @@ if __name__ == "__main__":
  # Placement     
     input_frame.grid(row=0, column=0, padx=(30,100), pady=(40,0))
     output_frame.grid(row=0, column=1, pady=(40,0))
-
+    
+    
     for i, (ib1, ib2, ie1, ie2) in enumerate(list(zip(input_button1, input_button2, input_entry1, input_entry2))):
         placement(element=ib1, row=0, column=i)
         placement(element=ib2, row=2, column=i,  pady=(30,0))
         
-        placement(element=ie1, row=1, column=i,  pady=(10,0), ipady=2, relief='sunken')
-        placement(element=ie2, row=3, column=i,  pady=(10,0), ipady=2, relief='sunken')        
+        placement_input_entry(ie1, row=1)
+        placement_input_entry(ie2, row=3)    
 
-    for i, (ol1, ov1) in enumerate(list(zip(output_label1, output_value1))):   
-        placement(element=ol1, row=i, column=0,  pady=(0 if i==0 else 10,0), ipady=4)
-        placement(element=ov1, row=i, column=1, pady=(0 if i==0 else 10,0), ipady=4)
-
-    for i, (ol2, ov2) in enumerate(list(zip(output_label2, output_value2))):  
-        placement(element=ol2, row=i, column=2, padx=(40,0),  pady=(0 if i==0 else 10,0), ipady=4)                     
-        placement(element=ov2, row=i, column=3, pady=(0 if i==0 else 10,0), ipady=4)
-
+    for i, (ol1, ov1) in enumerate(list(zip(output_label1, output_value1))):
+        placement_output_entry(ol1, column=0)
+        placement_output_entry(ov1, column=1)
+        
+    for i, (ol2, ov2) in enumerate(list(zip(output_label2, output_value2))):
+        placement_output_entry(ol2, column=2, padx=(40,0))
+        placement_output_entry(ov2, column=3)
+        
     
 # Balance Button & Value
     balance_button = tkinter.Button(output_frame, text="Balance", width=11, anchor="w", bg='#f3f798')
-    balance_value = tkinter.Entry(output_frame, width=12,  justify='center', font='Helvetica 8 bold', state='readonly')
+    balance_value = tkinter.Entry(output_frame, width=12,  justify='center',  state='readonly', **styleBold )
     
     placement(element=balance_value, row=len(output_label1)+1, column=1,  pady=(10,0), ipady=4)
     placement(element=balance_button, row=len(output_value1)+1, column=0,  pady=(10,0), ipady=2)
