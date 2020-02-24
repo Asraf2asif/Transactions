@@ -13,13 +13,13 @@ def insert_input():
     value = [float(vl.group()) if vl else 0 for vl in  input_value]
 
     for i,vl in enumerate(value):
-        if i in range(4) or not(thousand_shorthand_var.get()):
+        if i in value[0:5] or not(thousand_shorthand_var.get()):
             value[i] = int(value[i])
 
     if thousand_shorthand_var.get():
-        for i in range(4,12):
+        for i in range(4,len(value)):
             value[i] *= 1000
-    
+    print(value)
     if Counter(value)[0] != len(value): cur.execute("""INSERT INTO "Transaction" (
                                                       "{0[0]}" , "{0[1]}" , "{0[2]}" ,"{0[3]}" , "{0[4]}" , "{0[5]}" ,
                                                       "{0[6]}" , "{0[7]}" , "{0[8]}" ,"{0[9]}" , "{0[10]}" , "{0[11]}")
