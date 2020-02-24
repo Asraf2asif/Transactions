@@ -9,7 +9,7 @@ def placement(element, row=0, column=0,  sticky='nw', padx=(10,0), pady=(0,0), i
         
 
 def insert_input():
-    input_value = [input_regex.search(el.get()) for el in all_input if el]
+    input_value = [input_regex.search(el.get()) for el in input_entry if el]
     value = [float(vl.group()) if vl else 0 for vl in  input_value]
 
     for i,vl in enumerate(value):
@@ -19,10 +19,9 @@ def insert_input():
     if thousand_shorthand_var.get():
         for i in range(4, len(value)):
             value[i] *= 1000
-    print(value)
-    
-    col_name=",".join(['"'+i+'"' for i in (input1_name + input2_name)])
-    ques_input = ",".join(["?" for i in (input1_name + input2_name)])
+        
+    col_name=",".join(['"'+i+'"' for i in input_name])
+    ques_input = ",".join(["?" for i in input_name])
         
     query = 'INSERT INTO "Transaction" ('+ col_name + ') VALUES ('+ ques_input +')'
  
@@ -35,10 +34,9 @@ def total():
 
     Total = []
 
-    input_name = [input1_name[4], input1_name[5],
-                               input2_name[0], input2_name[1], input2_name[2], input2_name[3]]
-
-    for name in input_name:
+    input_name_part = input1_name[4:6] +  input2_name[0:4]
+    
+    for name in input_name_part:
         cur.execute('SELECT sum("{}") FROM "Transaction"'.format(name, ))
         Total.append(int(cur.fetchone()[0]))
 
@@ -59,16 +57,16 @@ def total():
     
     balance_value.insert(0, '{:,}'.format(Total_Comp - Total_Hand))
 
-    for el in (all_output):   el.config(state='readonly')
+    for el in (output_value):   el.config(state='readonly')
     balance_value.config(state='readonly')   
     
 
 def reset():
     
-    for el in all_output:   el.config(state='normal')
+    for el in output_value:   el.config(state='normal')
     balance_value.config(state='normal')
     
-    for el in (all_input + all_output):  el.delete(0, tkinter.END)
+    for el in (input_entry + output_value):  el.delete(0, tkinter.END)
     balance_value.delete(0, tkinter.END)
   
 
@@ -124,9 +122,12 @@ if __name__ == "__main__":
     thousand_shorthand =  tkinter.Checkbutton(input_frame, text="(000)?", variable=thousand_shorthand_var, bg='#4ecca3')
     placement(element=thousand_shorthand, row=4, column=1,  pady=(30,0))
     
+    input_name = input1_name + input2_name
+    input_entry = input_entry1 + input_entry2
+    input_button = input_button1, input_button2
     
-    all_input = input_entry1 + input_entry2
-    all_output = output_value1 + output_value2
+    output_name = output1_name + output2_name
+    output_value = output_value1 + output_value2
     
     output_value1[3].config(font='Helvetica 8 bold')
     output_value2[5].config(font='Helvetica 8 bold')
@@ -166,8 +167,8 @@ if __name__ == "__main__":
     balance_button = tkinter.Button(output_frame, text="Balance", width=11, anchor="w", bg='#f3f798')
     balance_value = tkinter.Entry(output_frame, width=12,  justify='center', font='Helvetica 8 bold', state='readonly')
     
-    placement(element=balance_value, row=len(output1_name)+1, column=1,  pady=(10,0), ipady=4)
-    placement(element=balance_button, row=len(output1_name)+1, column=0,  pady=(10,0), ipady=2)
+    placement(element=balance_value, row=len(output_label1)+1, column=1,  pady=(10,0), ipady=4)
+    placement(element=balance_button, row=len(output_value1)+1, column=0,  pady=(10,0), ipady=2)
 
     
 # Submit Button
