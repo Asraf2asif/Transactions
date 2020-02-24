@@ -48,8 +48,8 @@ def total():
         cur.execute('SELECT sum("{}") FROM "Transaction"'.format(name, ))
         Total.append(int(cur.fetchone()[0]))
 
-    Total_Hand = Total[0] + Total[1]
-    Total_Comp = Total[2] + Total[3] + Total[4] + Total[5]
+    Total_Hand = sum(Total[0:2])
+    Total_Comp = sum(Total[2:6])
     
     reset()   
     
