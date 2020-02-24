@@ -13,7 +13,7 @@ def insert_input():
     value = [float(vl.group()) if vl else 0 for vl in  input_value]
 
     for i,vl in enumerate(value):
-        if i in value[0:5] or not(thousand_shorthand_var.get()):
+        if i in range(4) or not(thousand_shorthand_var.get()):
             value[i] = int(value[i])
 
     if thousand_shorthand_var.get():
