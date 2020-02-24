@@ -3,13 +3,13 @@ import re
 import sqlite3
 from collections import Counter
 
-def placement(element, row=0, column=0,  sticky='nw', padx=(10,0), pady=(0,0), border=2, relief='groove', ipady=0):
+def placement(element, row=0, column=0,  sticky='nw', padx=(10,0), pady=(0,0), ipady=0, border=2, relief='groove'):
         element.grid(row=row, column=column, sticky=sticky, padx=padx, pady=pady, ipady=ipady)
         element.config(border=border, relief=relief)
         
 
 def insert_input():
-    input_value = [input_regex.search(el.get()) for el in all_input]
+    input_value = [input_regex.search(el.get()) for el in all_input if el]
     value = [float(vl.group()) if vl else 0 for vl in  input_value]
 
     for i,vl in enumerate(value):
@@ -20,12 +20,14 @@ def insert_input():
         for i in range(4,len(value)):
             value[i] *= 1000
     print(value)
-    if Counter(value)[0] != len(value): cur.execute("""INSERT INTO "Transaction" (
-                                                      "{0[0]}" , "{0[1]}" , "{0[2]}" ,"{0[3]}" , "{0[4]}" , "{0[5]}" ,
-                                                      "{0[6]}" , "{0[7]}" , "{0[8]}" ,"{0[9]}" , "{0[10]}" , "{0[11]}")
-                                                         VALUES (?,?,?,?,?,?,?,?,?,?,?,?)"""
-                                                       .format(input1_name + input2_name),
-                                                      (value[0], value[1],value[2],value[3],value[4],value[5],value[6],value[7],value[8],value[9],value[10],value[11]))
+    #x=['value[' + i + ']' for i in 
+    col_name=",".join(['"'+i+'"' for i in (input1_name + input2_name)])
+    ques_input = ",".join(["?" for i in (input1_name + input2_name)])
+    
+    query = 'INSERT INTO "Transaction" ('+ col_name + ')VALUES ('+ ques_input +')'
+ 
+    if Counter(value)[0] != len(value): cur.execute(query,
+                                                    (value[0], value[1],value[2],value[3],value[4],value[5],value[6],value[7],value[8],value[9],value[10],value[11]))
 
     con.commit()
 
