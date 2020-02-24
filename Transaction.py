@@ -17,17 +17,16 @@ def insert_input():
             value[i] = int(value[i])
 
     if thousand_shorthand_var.get():
-        for i in range(4,len(value)):
+        for i in range(4, len(value)):
             value[i] *= 1000
     print(value)
-    #x=['value[' + i + ']' for i in 
+    
     col_name=",".join(['"'+i+'"' for i in (input1_name + input2_name)])
     ques_input = ",".join(["?" for i in (input1_name + input2_name)])
-    
-    query = 'INSERT INTO "Transaction" ('+ col_name + ')VALUES ('+ ques_input +')'
+        
+    query = 'INSERT INTO "Transaction" ('+ col_name + ') VALUES ('+ ques_input +')'
  
-    if Counter(value)[0] != len(value): cur.execute(query,
-                                                    (value[0], value[1],value[2],value[3],value[4],value[5],value[6],value[7],value[8],value[9],value[10],value[11]))
+    if Counter(value)[0] != len(value): cur.execute(query, ([i for i in value]))
 
     con.commit()
 
@@ -125,7 +124,6 @@ if __name__ == "__main__":
     thousand_shorthand =  tkinter.Checkbutton(input_frame, text="(000)?", variable=thousand_shorthand_var, bg='#4ecca3')
     placement(element=thousand_shorthand, row=4, column=1,  pady=(30,0))
     
-
     
     all_input = input_entry1 + input_entry2
     all_output = output_value1 + output_value2
