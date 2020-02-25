@@ -2,6 +2,8 @@ import tkinter
 import re
 import sqlite3
 from collections import Counter
+from datetime import date
+
 
 def placement(element, row=0, column=0,  sticky='nw', padx=(10,0), pady=(0,0), ipady=0, border=2, relief='groove'):
         element.grid(row=row, column=column, sticky=sticky, padx=padx, pady=pady, ipady=ipady)
@@ -15,6 +17,23 @@ def placement_input_entry(el, row):
 def placement_output_entry(el, column, padx=(10,0), pady=(10,0)):
         return placement(element=el, row=i, column=column, padx=padx, pady=(0 if i==0 else pady), ipady=4)
         
+
+def r_p_input():
+    r_p_input = [input_regex.search(el.get()) for el in r_p_value[0:-1] if el]
+    value = [float(vl.group()) if vl else 0 for vl in  r_p_input]
+
+    for i,vl in enumerate(value):
+        value[i] = int(value[i])
+            
+    col_name=",".join(['"'+i+'"' for i in r_p_name[0:-1]])
+    ques_input = ",".join(["?" for i in r_p_name[0:-1]])
+        
+    query = 'INSERT INTO "Receipt_Payment" ('+ col_name + ') VALUES ('+ ques_input +')'
+ 
+    if Counter(value)[0] != len(value): cur.execute(query, ([i for i in value]))
+
+    con.commit()
+
 
 def insert_input():
     input_value = [input_regex.search(el.get()) for el in input_entry if el]
@@ -31,7 +50,7 @@ def insert_input():
     col_name=",".join(['"'+i+'"' for i in input_name])
     ques_input = ",".join(["?" for i in input_name])
         
-    query = 'INSERT INTO "Transaction" ('+ col_name + ') VALUES ('+ ques_input +')'
+    query = 'INSERT INTO "{0}" ('.format(table_name) + col_name + ') VALUES ('+ ques_input +')'
  
     if Counter(value)[0] != len(value): cur.execute(query, ([i for i in value]))
 
@@ -48,13 +67,20 @@ def total():
     input_name_cash = input1_name[0:4] +  input2_name[4:6]
     
     for name in input_name_part:
-        cur.execute('SELECT sum("{}") FROM "Transaction"'.format(name, ))
+        cur.execute('SELECT sum("{}") FROM "{}"'.format(name, table_name))
         Total.append(int(cur.fetchone()[0]))
 
     for name in input_name_cash:
-        cur.execute('SELECT sum("{}") FROM "Transaction"'.format(name, ))
+        cur.execute('SELECT sum("{}") FROM "{}"'.format(name, table_name))
         Cash.append(int(cur.fetchone()[0]))
 
+    cur.execute('SELECT * FROM "Receipt_Payment" ORDER BY "ID" DESC LIMIT 1')
+    
+    try:
+        R_P = cur.fetchall()[0][1:]
+    except:
+        R_P = [0]*7
+    
     cash_label[2].config(text="  1000 X " + str(Cash[0]))
     cash_label[3].config(text="  500 X " + str(Cash[1]))
     cash_label[4].config(text="  100 X " + str(Cash[2]))
@@ -75,7 +101,15 @@ def total():
     for i in range(2,6):
             if Total[i] != 0:
                     output_value2[i-1].insert(0, '{:,}'.format(Total[i]))
-                    
+
+    for i,vl in enumerate(R_P[:-1]):
+        r_p_value[i].insert(0, '{:,}'.format(int(vl)))
+        
+    r_p_closing = int(sum(R_P[0:5]) - R_P[5:6][0])
+    Total_Comp += r_p_closing
+    
+    r_p_value[6].insert(0, '{:,}'.format(r_p_closing))
+    
     for ii,i in enumerate(range(2,6)):
         cash_value[i].insert(0, '{:,}'.format(Cash[ii]))
                     
@@ -84,14 +118,16 @@ def total():
     cash_value[6].insert(0, '{:,}'.format(Total_Cash))
     
     output_value1[2].insert(0, '{:,}'.format(Total_Cash))
-    output_value1[3].insert(0, '{:,}'.format(Total_Hand))       
+    output_value1[3].insert(0, '{:,}'.format(Total_Hand))
+    output_value2[0].insert(0, '{:,}'.format(r_p_closing))
     output_value2[5].insert(0, '{:,}'.format(Total_Comp))
      
-    balance_value.insert(0, '{:,}'.format(Total_Comp - Total_Hand))
+    balance_value.insert(0, '{:,}'.format(Total_Hand - Total_Comp))
 
     for el in (output_value):   el.config(state='readonly')
     for el in (cash_value):   el.config(state='readonly')
-    balance_value.config(state='readonly')   
+    balance_value.config(state='readonly')
+    r_p_value[6].config(state='readonly')
     
     
 def reset():
@@ -99,15 +135,18 @@ def reset():
     for el in output_value:   el.config(state='normal')
     for el in cash_value:   el.config(state='normal')
     balance_value.config(state='normal')
+    r_p_value[6].config(state='normal')
     
     for el in (input_entry + output_value):  el.delete(0, tkinter.END)
     for el in (cash_value):  el.delete(0, tkinter.END)
+    for el in (r_p_value):  el.delete(0, tkinter.END)
     balance_value.delete(0, tkinter.END)
   
 
 def submit():
 
     insert_input()
+    r_p_input()
     
     try:  
         total()
@@ -135,6 +174,7 @@ if __name__ == "__main__":
     output2_name = [" R/P (C/D)", " T. Bill"," T. Loan: R.", " T. Loan: PCT", " T. Income V.", " Total (Comp.)"]
 
     cash_name = [" Bundle L.", " Bundle S."," 1000", " 500", " 100", " Others"," Total (Cash)"]
+    r_p_name = [" R/P (B/D)", " I.V. & Loan"," Bill (Pre)", " Reception I.", " Pharmacy I.", " Posted V."," R/P (C/D)"]
 
     styleOpts1 = { 'width' : 12,  'justify' : 'center' }
     styleBold = { 'font' : 'Helvetica 8 bold'}
@@ -152,12 +192,14 @@ if __name__ == "__main__":
     output_label1 = [tkinter.Label(output_frame, text=name, width=12,  anchor="w", bg='#ffa5a5') for name in output1_name]
     output_label2 = [tkinter.Label(output_frame, text=name, width=12,  anchor="w", bg='#eab4f8') for name in output2_name]
 
-    cash_label = [tkinter.Label(output_frame, text=name, width=12,  anchor="w", bg='#eab4f8') for name in cash_name]
+    cash_label = [tkinter.Label(output_frame, text=name, width=12,  anchor="w", bg='#4ecca3') for name in cash_name]
+    r_p_label = [tkinter.Label(output_frame, text=name, width=12,  anchor="w", bg='#71c9ce') for name in r_p_name]
     
     output_value1 = [tkinter.Entry(output_frame, state='readonly', **styleOpts1) for name in output1_name]
     output_value2 = [tkinter.Entry(output_frame, state='readonly', **styleOpts1) for name in output2_name]
 
     cash_value = [tkinter.Entry(output_frame, state='readonly', **styleOpts1) for name in cash_name]
+    r_p_value = [tkinter.Entry(output_frame, **styleOpts1) for name in r_p_name]
 
         
     thousand_shorthand_var = tkinter.IntVar()
@@ -174,16 +216,27 @@ if __name__ == "__main__":
     output_value1[3].config(**styleBold)
     output_value2[5].config(**styleBold)
     cash_value[6].config(**styleBold)
+    r_p_value[6].config(state='readonly', **styleBold)
     
 
 # Database
+    today = date.today()
+    date = today.strftime("%b-%d-%Y")
+    table_name = "Transaction: " + str(date)
+    print(table_name)
+    
     con=sqlite3.connect('../Transactions.db')
     cur=con.cursor()
-    cur.execute("""CREATE TABLE IF NOT EXISTS "Transaction" (
+    cur.execute("""CREATE TABLE IF NOT EXISTS "{1}" (
                             "ID" INTEGER PRIMARY KEY AUTOINCREMENT,
                             "{0[0]}" REAL, "{0[1]}" REAL, "{0[2]}" REAL,"{0[3]}" REAL, "{0[4]}" REAL, "{0[5]}" REAL,
                             "{0[6]}" REAL, "{0[7]}" REAL, "{0[8]}" REAL,"{0[9]}" REAL, "{0[10]}" REAL, "{0[11]}" REAL)"""
-                             .format(input1_name + input2_name))
+                             .format(input_name, table_name))
+    
+    cur.execute("""CREATE TABLE IF NOT EXISTS "Receipt_Payment" (
+                            "ID" INTEGER PRIMARY KEY AUTOINCREMENT,
+                            "{0[0]}" REAL, "{0[1]}" REAL, "{0[2]}" REAL,"{0[3]}" REAL, "{0[4]}" REAL, "{0[5]}" REAL, "{0[6]}" REAL)"""
+                             .format(r_p_name))
     
 
  # Placement     
@@ -210,7 +263,11 @@ if __name__ == "__main__":
         i+=len(output_label1) + 3
         placement_output_entry(cl, column=0, pady=((40,0) if i==7 else (10,0)))
         placement_output_entry(cv, column=1, pady=((40,0) if i==7 else (10,0)))
-  
+        
+    for i, (rpl, rpv) in enumerate(list(zip(r_p_label, r_p_value))):
+        i+=len(output_label2) + 1
+        placement_output_entry(rpl, column=2, padx=(40,0), pady=((40,0) if i==7 else (10,0)))
+        placement_output_entry(rpv, column=3, pady=((40,0) if i==7 else (10,0)))
     
 # Balance Button & Value
     balance_button = tkinter.Button(output_frame, text="Balance", width=11, anchor="w", bg='#f3f798')
