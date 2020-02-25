@@ -132,7 +132,7 @@ def total():
     
 def reset():
     
-    for el in (output_value):   el.config(state='normal')
+    for el in output_value:   el.config(state='normal')
     for el in cash_value:   el.config(state='normal')
     balance_value.config(state='normal')
     r_p_value[6].config(state='normal')
@@ -183,8 +183,8 @@ if __name__ == "__main__":
 
 
 # Element
-    input_button1 = [tkinter.Button(input_frame, text=name, width=10, height=1, bg='#71c9ce', fg='black') for name in input1_name]
-    input_button2 = [tkinter.Button(input_frame, text=name, width=10, height=1, bg='#71c9ce') for name in input2_name]
+    input_button1 = [tkinter.Button(input_frame, text=name, width=10, height=1, bg='#71c9ce', fg='black', cursor="hand2") for name in input1_name]
+    input_button2 = [tkinter.Button(input_frame, text=name, width=10, height=1, bg='#71c9ce', cursor="hand2") for name in input2_name]
 
     input_entry1 = [tkinter.Entry(input_frame, textvariable=name+"_var",  bg='#d3d4d8', **styleOpts1) for name in input1_name]
     input_entry2 = [tkinter.Entry(input_frame, textvariable=name+"_var",  bg='#d3d4d8', **styleOpts1) for name in input2_name]
@@ -203,7 +203,7 @@ if __name__ == "__main__":
 
         
     thousand_shorthand_var = tkinter.IntVar()
-    thousand_shorthand =  tkinter.Checkbutton(input_frame, text="(000)?", variable=thousand_shorthand_var, bg='#4ecca3')
+    thousand_shorthand =  tkinter.Checkbutton(input_frame, text="(000)?", variable=thousand_shorthand_var, bg='#4ecca3', cursor="hand2")
     placement(element=thousand_shorthand, row=4, column=1,  pady=(30,0))
     
     input_name = input1_name + input2_name
@@ -270,7 +270,7 @@ if __name__ == "__main__":
         placement_output_entry(rpv, column=3, pady=((40,0) if i==7 else (10,0)))
     
 # Balance Button & Value
-    balance_button = tkinter.Button(output_frame, text="Balance", width=11, anchor="w", bg='#f3f798')
+    balance_button = tkinter.Button(output_frame, text="Balance", width=11, anchor="w", bg='#f3f798', cursor="hand2")
     balance_value = tkinter.Entry(output_frame, width=12,  justify='center',  state='readonly', **styleBold )
     
     placement(element=balance_value, row=len(output_label1)+1, column=1,  pady=(10,0), ipady=4)
@@ -278,7 +278,7 @@ if __name__ == "__main__":
 
     
 # Submit Button
-    submit_button = tkinter.Button(input_frame, text="Submit", width=10, height=1, command=submit, bg='#1891ac', fg='white')
+    submit_button = tkinter.Button(input_frame, text="Submit", width=10, height=1, command=submit, bg='#1891ac', fg='white', cursor="hand2")
     placement(element=submit_button, row=4, column=5,  pady=(30,0), ipady=2)
 
 
