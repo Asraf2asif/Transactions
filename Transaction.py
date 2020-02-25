@@ -28,7 +28,7 @@ def r_p_input():
     col_name=",".join(['"'+i+'"' for i in r_p_name[0:-1]])
     ques_input = ",".join(["?" for i in r_p_name[0:-1]])
         
-    query = 'INSERT INTO "Receipt_Payment" ('+ col_name + ') VALUES ('+ ques_input +')'
+    query = 'INSERT INTO "{}" ('.format(r_p_table) + col_name + ') VALUES ('+ ques_input +')'
  
     if Counter(value)[0] != len(value): cur.execute(query, ([i for i in value]))
 
@@ -74,7 +74,7 @@ def total():
         cur.execute('SELECT sum("{}") FROM "{}"'.format(name, table_name))
         Cash.append(int(cur.fetchone()[0]))
 
-    cur.execute('SELECT * FROM "Receipt_Payment" ORDER BY "ID" DESC LIMIT 1')
+    cur.execute('SELECT * FROM "{}" ORDER BY "ID" DESC LIMIT 1'.format(r_p_table))
     
     try:
         R_P = cur.fetchall()[0][1:]
@@ -223,7 +223,7 @@ if __name__ == "__main__":
     today = date.today()
     date = today.strftime("%b-%d-%Y")
     table_name = "Transaction: " + str(date)
-    print(table_name)
+    r_p_table = "Receipt_Payment: " + str(date)
     
     con=sqlite3.connect('../Transactions.db')
     cur=con.cursor()
@@ -233,10 +233,10 @@ if __name__ == "__main__":
                             "{0[6]}" REAL, "{0[7]}" REAL, "{0[8]}" REAL,"{0[9]}" REAL, "{0[10]}" REAL, "{0[11]}" REAL)"""
                              .format(input_name, table_name))
     
-    cur.execute("""CREATE TABLE IF NOT EXISTS "Receipt_Payment" (
+    cur.execute("""CREATE TABLE IF NOT EXISTS "{1}" (
                             "ID" INTEGER PRIMARY KEY AUTOINCREMENT,
                             "{0[0]}" REAL, "{0[1]}" REAL, "{0[2]}" REAL,"{0[3]}" REAL, "{0[4]}" REAL, "{0[5]}" REAL, "{0[6]}" REAL)"""
-                             .format(r_p_name))
+                             .format(r_p_name, r_p_table))
     
 
  # Placement     
