@@ -132,7 +132,7 @@ def total():
     
 def reset():
     
-    for el in output_value:   el.config(state='normal')
+    for el in (output_value):   el.config(state='normal')
     for el in cash_value:   el.config(state='normal')
     balance_value.config(state='normal')
     r_p_value[6].config(state='normal')
