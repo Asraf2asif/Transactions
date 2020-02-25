@@ -12,8 +12,8 @@ def placement_input_entry(el, row):
         return placement(element=el, row=row, column=i,  pady=(10,0), ipady=2, relief='sunken')
 
 
-def placement_output_entry(el, column, padx=(10,0)):
-        return placement(element=el, row=i, column=column, padx=padx, pady=(0 if i==0 else 10,0), ipady=4)
+def placement_output_entry(el, column, padx=(10,0), pady=(10,0)):
+        return placement(element=el, row=i, column=column, padx=padx, pady=(0 if i==0 else pady), ipady=4)
         
 
 def insert_input():
@@ -41,40 +41,67 @@ def insert_input():
 def total():
 
     Total = []
+    Cash = []
+    Cash_type = [1000, 500, 100, 1, 1, 1]
 
     input_name_part = input1_name[4:6] +  input2_name[0:4]
+    input_name_cash = input1_name[0:4] +  input2_name[4:6]
     
     for name in input_name_part:
         cur.execute('SELECT sum("{}") FROM "Transaction"'.format(name, ))
         Total.append(int(cur.fetchone()[0]))
 
+    for name in input_name_cash:
+        cur.execute('SELECT sum("{}") FROM "Transaction"'.format(name, ))
+        Cash.append(int(cur.fetchone()[0]))
+
+    cash_label[2].config(text="  1000 X " + str(Cash[0]))
+    cash_label[3].config(text="  500 X " + str(Cash[1]))
+    cash_label[4].config(text="  100 X " + str(Cash[2]))
+    
+    for i, vl in enumerate(Cash_type): Cash[i] = Cash[i] * vl
+    
     Total_Hand = sum(Total[0:2])
     Total_Comp = sum(Total[2:6])
+    Total_Cash = sum(Cash[0:6])
+    Total_Hand += Total_Cash
     
     reset()   
     
     for i in range(2):
             if Total[i] != 0:
-                    output_value1[i].insert(0, '{:,}'.format(Total[i]))  
+                    output_value1[i].insert(0, '{:,}'.format(Total[i]))
+                    
     for i in range(2,6):
             if Total[i] != 0:
                     output_value2[i-1].insert(0, '{:,}'.format(Total[i]))
-
+                    
+    for ii,i in enumerate(range(2,6)):
+        cash_value[i].insert(0, '{:,}'.format(Cash[ii]))
+                    
+    cash_value[0].insert(0, '{:,}'.format(Cash[4]))
+    cash_value[1].insert(0, '{:,}'.format(Cash[5]))
+    cash_value[6].insert(0, '{:,}'.format(Total_Cash))
+    
+    output_value1[2].insert(0, '{:,}'.format(Total_Cash))
     output_value1[3].insert(0, '{:,}'.format(Total_Hand))       
     output_value2[5].insert(0, '{:,}'.format(Total_Comp))
-    
+     
     balance_value.insert(0, '{:,}'.format(Total_Comp - Total_Hand))
 
     for el in (output_value):   el.config(state='readonly')
+    for el in (cash_value):   el.config(state='readonly')
     balance_value.config(state='readonly')   
     
-
+    
 def reset():
     
     for el in output_value:   el.config(state='normal')
+    for el in cash_value:   el.config(state='normal')
     balance_value.config(state='normal')
     
     for el in (input_entry + output_value):  el.delete(0, tkinter.END)
+    for el in (cash_value):  el.delete(0, tkinter.END)
     balance_value.delete(0, tkinter.END)
   
 
@@ -107,6 +134,8 @@ if __name__ == "__main__":
     output1_name = [" Suspense Total", " Voucher Total", " Cash Total", " Total (Hand)"]
     output2_name = [" R/P (C/D)", " T. Bill"," T. Loan: R.", " T. Loan: PCT", " T. Income V.", " Total (Comp.)"]
 
+    cash_name = [" Bundle L.", " Bundle S."," 1000", " 500", " 100", " Others"," Total (Cash)"]
+
     styleOpts1 = { 'width' : 12,  'justify' : 'center' }
     styleBold = { 'font' : 'Helvetica 8 bold'}
 
@@ -122,9 +151,13 @@ if __name__ == "__main__":
     
     output_label1 = [tkinter.Label(output_frame, text=name, width=12,  anchor="w", bg='#ffa5a5') for name in output1_name]
     output_label2 = [tkinter.Label(output_frame, text=name, width=12,  anchor="w", bg='#eab4f8') for name in output2_name]
+
+    cash_label = [tkinter.Label(output_frame, text=name, width=12,  anchor="w", bg='#eab4f8') for name in cash_name]
     
-    output_value1 = [tkinter.Entry(output_frame, state='readonly', bg='#d3d4d8', **styleOpts1) for name in output1_name]
+    output_value1 = [tkinter.Entry(output_frame, state='readonly', **styleOpts1) for name in output1_name]
     output_value2 = [tkinter.Entry(output_frame, state='readonly', **styleOpts1) for name in output2_name]
+
+    cash_value = [tkinter.Entry(output_frame, state='readonly', **styleOpts1) for name in cash_name]
 
         
     thousand_shorthand_var = tkinter.IntVar()
@@ -140,6 +173,7 @@ if __name__ == "__main__":
     
     output_value1[3].config(**styleBold)
     output_value2[5].config(**styleBold)
+    cash_value[6].config(**styleBold)
     
 
 # Database
@@ -153,7 +187,7 @@ if __name__ == "__main__":
     
 
  # Placement     
-    input_frame.grid(row=0, column=0, padx=(30,100), pady=(40,0))
+    input_frame.grid(row=0, column=0, padx=(30,100), pady=(40,305))
     output_frame.grid(row=0, column=1, pady=(40,0))
     
     
@@ -171,7 +205,12 @@ if __name__ == "__main__":
     for i, (ol2, ov2) in enumerate(list(zip(output_label2, output_value2))):
         placement_output_entry(ol2, column=2, padx=(40,0))
         placement_output_entry(ov2, column=3)
-        
+
+    for i, (cl, cv) in enumerate(list(zip(cash_label, cash_value))):
+        i+=len(output_label1) + 3
+        placement_output_entry(cl, column=0, pady=((40,0) if i==7 else (10,0)))
+        placement_output_entry(cv, column=1, pady=((40,0) if i==7 else (10,0)))
+  
     
 # Balance Button & Value
     balance_button = tkinter.Button(output_frame, text="Balance", width=11, anchor="w", bg='#f3f798')
