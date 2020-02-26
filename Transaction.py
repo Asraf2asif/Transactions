@@ -79,7 +79,8 @@ def total():
     try:
         R_P = cur.fetchall()[0][1:]
     except:
-        R_P = [0]*7
+        print("No Entry To Sum1")
+        #R_P = [0]*7
     
     cash_label[2].config(text="  1000 X " + str(Cash[0]))
     cash_label[3].config(text="  500 X " + str(Cash[1]))
@@ -151,7 +152,7 @@ def submit():
     try:  
         total()
     except:
-        print("No Entry To Sum")
+        print("No Entry To Sum2")
 
 
 if __name__ == "__main__":
