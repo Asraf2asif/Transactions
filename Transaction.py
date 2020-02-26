@@ -139,7 +139,9 @@ def total():
     for el in (cash_value): convert_readonly(el)
     convert_readonly(balance_value)
     convert_readonly(r_p_value[6])
-       
+     
+    search_id.grid_forget()
+
     
 def reset():
                      
@@ -160,7 +162,7 @@ def submit():
 
     insert_input()
     r_p_input()
-    
+
     try:  
         total()
     except:
@@ -181,7 +183,7 @@ if __name__ == "__main__":
 
 # Name
     input1_name = ["1000","500","100","-","Suspension","Voucher"]
-    input2_name= ["Bill", "Loan: R", "Loan: PCT", "Income V", "Bundle L", "Bundle S"]
+    input2_name= ["Bill", "Loan: R.", "Loan: PCT", "Income V.", "Bundle L.", "Bundle S."]
     
     output1_name = [" Suspense Total", " Voucher Total", " Cash Total", " Total (Hand)"]
     output2_name = [" R/P (C/D)", " T. Bill"," T. Loan: R.", " T. Loan: PCT", " T. Income V.", " Total (Comp.)"]
@@ -193,6 +195,7 @@ if __name__ == "__main__":
 
     styleOpts1 = { 'width' : 12,  'justify' : 'center' }
     styleBold = { 'font' : 'Helvetica 8 bold'}
+    styleID = { 'width' : 12, 'font' : 'Helvetica 8 bold'}
 
     input_regex = re.compile (r'^[-+]?[\d]*\.?[\d]+$')
 
@@ -215,11 +218,10 @@ if __name__ == "__main__":
 
     cash_value = [tkinter.Entry(output_frame, state='readonly', **styleOpts1) for name in cash_name]
     r_p_value = [tkinter.Entry(output_frame, **styleOpts1) for name in r_p_name]
-
         
     thousand_shorthand_var = tkinter.IntVar()
     thousand_shorthand =  tkinter.Checkbutton(input_frame, text="(000)?", variable=thousand_shorthand_var, bg='#4ecca3', cursor="hand2")
-    placement(element=thousand_shorthand, row=4, column=1,  pady=(30,0))
+    placement(element=thousand_shorthand, row=5, column=1,  pady=(30,0))
     
     input_name = input1_name + input2_name
     input_entry = input_entry1 + input_entry2
@@ -255,16 +257,16 @@ if __name__ == "__main__":
     
 
  # Placement     
-    input_frame.grid(row=0, column=0, padx=(30,100), pady=(40,305))
-    output_frame.grid(row=0, column=1, pady=(40,0))
+    input_frame.grid(row=0, column=0, padx=(30,100), pady=(15,305))
+    output_frame.grid(row=0, column=1, pady=(78,0))
     
     
     for i, (ib1, ib2, ie1, ie2) in enumerate(list(zip(input_button1, input_button2, input_entry1, input_entry2))):
-        placement(element=ib1, row=0, column=i)
-        placement(element=ib2, row=2, column=i,  pady=(30,0))
+        placement(element=ib1, row=1, column=i)
+        placement(element=ib2, row=3, column=i,  pady=(30,0))
         
-        placement_input_entry(ie1, row=1)
-        placement_input_entry(ie2, row=3)    
+        placement_input_entry(ie1, row=2)
+        placement_input_entry(ie2, row=4)    
 
     for i, (ol1, ov1) in enumerate(list(zip(output_label1, output_value1))):
         placement_output_entry(ol1, column=0)
@@ -294,9 +296,98 @@ if __name__ == "__main__":
     
 # Submit Button
     submit_button = tkinter.Button(input_frame, text="Submit", width=10, height=1, command=submit, bg='#1891ac', fg='white', cursor="hand2")
-    placement(element=submit_button, row=4, column=5,  pady=(30,0), ipady=2)
+    placement(element=submit_button, row=5, column=5,  pady=(30,0), ipady=2)
+    
+# Search
+    def last_id():
+        cur.execute('SELECT MAX("ID") from "{}"'.format(table_name))
+        search_id_vl = int(cur.fetchall()[0][0])
+        return search_id_vl
+      
+    search_id_vl = last_id()
+    search_id =  tkinter.Label(input_frame, text=str(search_id_vl), width=10, pady=5, anchor="s", bg='#71c9ce')
+
+    
+    def search():
+        
+        placement(element=search_id, row=0, column=5,  pady=(0,20))
+        
+        search_id.config(text=str(search_id_vl))
+
+        cur.execute('SELECT * FROM "{}" WHERE "ID"=?'.format(table_name),(search_id_vl,))
+        search_value = cur.fetchall()[0][1:]
+
+        for i, el in enumerate(input_entry):
+          el.delete(0, tkinter.END)
+          if search_value[i]!=0:
+              el.insert(0, int(search_value[i]))
+              
+    
+      
+    def update():
+        
+        input_value = [input_regex.search(el.get()) for el in input_entry if el]
+        value = [float(vl.group()) if vl else 0 for vl in  input_value]
+
+        for i,vl in enumerate(value):
+            if i in range(4) or not(thousand_shorthand_var.get()):
+                value[i] = int(value[i])
+
+        if thousand_shorthand_var.get():
+            for i in range(4, len(value)):
+                value[i] *= 1000
+            
+        col_name=",".join(['"'+i+'"' for i in input_name])
+               
+        ques_input = ",".join(["?" for i in input_entry])
+        
+        for i in range(len(input_name)): 
+          query = 'UPDATE "{}" SET "{}"="{}" WHERE "ID" = {}'.format(table_name,input_name[i],value[i],int(search_id_vl))
+
+          cur.execute(query)
+          con.commit()
+        total()
 
 
+    def previous_entry():
+        global search_id_vl
+        if search_id_vl != 0:
+          search_id_vl -=1
+          search()
+
+         
+    def next_entry():
+        global search_id_vl
+
+        if search_id_vl < last_id():
+          search_id_vl +=1
+          search()
+
+    def last_entry():
+        global search_id_vl
+
+        search_id_vl =last_id()
+        search()
+        
+    search_button = tkinter.Button(input_frame, text="Search", width=10, height=1, command=last_entry, bg='#1891ac', fg='white', cursor="hand2")
+    placement(element=search_button, row=0, column=0,  pady=(0,30), ipady=2)
+
+    update_button = tkinter.Button(input_frame, text="Save", width=10, height=1, command=update, bg='#1891ac', fg='white', cursor="hand2")
+    placement(element=update_button, row=0, column=1,  pady=(0,0), ipady=2)
+    
+    previous_button = tkinter.Button(input_frame, text="Previous", width=10, height=1, command=previous_entry, bg='#1891ac', fg='white', cursor="hand2")
+    placement(element=previous_button, row=0, column=2,  pady=(0,0), ipady=2)
+
+    next_button = tkinter.Button(input_frame, text="Next", width=10, height=1, command=next_entry, bg='#1891ac', fg='white', cursor="hand2")
+    placement(element=next_button, row=0, column=3,  pady=(0,0), ipady=2)
+
+
+    refresh_button = tkinter.Button(input_frame, text="Refresh", width=10, height=1, command=total, bg='#1891ac', fg='white', cursor="hand2")
+    placement(element=refresh_button, row=0, column=4,  pady=(0,30), ipady=2)
+
+    
+    
+        
     try:  
         total()
     except:
