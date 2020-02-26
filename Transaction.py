@@ -16,28 +16,36 @@ def placement_input_entry(el, row):
 
 def placement_output_entry(el, column, padx=(10,0), pady=(10,0)):
         return placement(element=el, row=i, column=column, padx=padx, pady=(0 if i==0 else pady), ipady=4)
-        
 
+
+def gen_value(cell):
+    input_value = [input_regex.search(el.get()) for el in cell if el]
+    value = [float(vl.group()) if vl else 0 for vl in  input_value]
+    return value
+
+  
+def gen_query(col, table):
+    col_name=",".join(['"'+i+'"' for i in col])
+    ques_input = ",".join(["?" for i in col])
+        
+    query = 'INSERT INTO "{}" ('.format(table) + col_name + ') VALUES ('+ ques_input +')'
+    return query
+
+    
 def r_p_input():
-    r_p_input = [input_regex.search(el.get()) for el in r_p_value[0:-1] if el]
-    value = [float(vl.group()) if vl else 0 for vl in  r_p_input]
+    value = gen_value(r_p_value[0:-1])
 
-    for i,vl in enumerate(value):
-        value[i] = int(value[i])
-            
-    col_name=",".join(['"'+i+'"' for i in r_p_name[0:-1]])
-    ques_input = ",".join(["?" for i in r_p_name[0:-1]])
-        
-    query = 'INSERT INTO "{}" ('.format(r_p_table) + col_name + ') VALUES ('+ ques_input +')'
- 
-    if Counter(value)[0] != len(value): cur.execute(query, ([i for i in value]))
+    for i,vl in enumerate(value): value[i] = int(value[i])
+    
+    query = gen_query(r_p_name[0:-1], r_p_table)
+    
+    cur.execute(query, ([i for i in value]))
 
     con.commit()
 
 
 def insert_input():
-    input_value = [input_regex.search(el.get()) for el in input_entry if el]
-    value = [float(vl.group()) if vl else 0 for vl in  input_value]
+    value = gen_value(input_entry)
 
     for i,vl in enumerate(value):
         if i in range(4) or not(thousand_shorthand_var.get()):
@@ -47,102 +55,106 @@ def insert_input():
         for i in range(4, len(value)):
             value[i] *= 1000
         
-    col_name=",".join(['"'+i+'"' for i in input_name])
-    ques_input = ",".join(["?" for i in input_name])
-        
-    query = 'INSERT INTO "{0}" ('.format(table_name) + col_name + ') VALUES ('+ ques_input +')'
+    query = gen_query(input_name, table_name)
  
     if Counter(value)[0] != len(value): cur.execute(query, ([i for i in value]))
 
     con.commit()
 
 
-def total():
+def sum_col(col, table, arr):
+    cur.execute('SELECT sum("{}") FROM "{}"'.format(col, table))
+    arr.append(int(cur.fetchone()[0]))
 
+def insert_value(insert_cell, insert_vl):
+    insert_cell.insert(0, '{:,}'.format(insert_vl))
+    
+def convert_readonly(el):
+    el.config(state='readonly')
+    
+def convert_normal(el):
+    el.config(state='normal')
+
+def delete_value(el):
+    el.delete(0, tkinter.END)
+
+def total():
+    # Arry
     Total = []
+    
     Cash = []
     Cash_type = [1000, 500, 100, 1, 1, 1]
-
+    
+    # Column Name
     input_name_part = input1_name[4:6] +  input2_name[0:4]
+    
     input_name_cash = input1_name[0:4] +  input2_name[4:6]
+
+    # Query
+    for name in input_name_part: sum_col(name, table_name, Total)
     
-    for name in input_name_part:
-        cur.execute('SELECT sum("{}") FROM "{}"'.format(name, table_name))
-        Total.append(int(cur.fetchone()[0]))
-
-    for name in input_name_cash:
-        cur.execute('SELECT sum("{}") FROM "{}"'.format(name, table_name))
-        Cash.append(int(cur.fetchone()[0]))
-
+    for name in input_name_cash: sum_col(name, table_name, Cash)
+   
     cur.execute('SELECT * FROM "{}" ORDER BY "ID" DESC LIMIT 1'.format(r_p_table))
+    try: R_P = cur.fetchall()[0][1:]
+    except: print("No Entry To Sum1") 
+
+    # Cash Details
+    for ii,i in enumerate(range(2,5)): cash_label[i].config(text= cash_detail[ii] + str(Cash[ii]))
     
-    try:
-        R_P = cur.fetchall()[0][1:]
-    except:
-        print("No Entry To Sum1")
-        #R_P = [0]*7
-    
-    cash_label[2].config(text="  1000 X " + str(Cash[0]))
-    cash_label[3].config(text="  500 X " + str(Cash[1]))
-    cash_label[4].config(text="  100 X " + str(Cash[2]))
-    
+    # Cash Adjustmaent
     for i, vl in enumerate(Cash_type): Cash[i] = Cash[i] * vl
     
+    # Gross Value
     Total_Hand = sum(Total[0:2])
-    Total_Comp = sum(Total[2:6])
     Total_Cash = sum(Cash[0:6])
     Total_Hand += Total_Cash
     
-    reset()   
-    
-    for i in range(2):
-            if Total[i] != 0:
-                    output_value1[i].insert(0, '{:,}'.format(Total[i]))
-                    
-    for i in range(2,6):
-            if Total[i] != 0:
-                    output_value2[i-1].insert(0, '{:,}'.format(Total[i]))
-
-    for i,vl in enumerate(R_P[:-1]):
-        r_p_value[i].insert(0, '{:,}'.format(int(vl)))
-        
+    Total_Comp = sum(Total[2:6])
     r_p_closing = int(sum(R_P[0:5]) - R_P[5:6][0])
     Total_Comp += r_p_closing
     
-    r_p_value[6].insert(0, '{:,}'.format(r_p_closing))
-    
-    for ii,i in enumerate(range(2,6)):
-        cash_value[i].insert(0, '{:,}'.format(Cash[ii]))
-                    
-    cash_value[0].insert(0, '{:,}'.format(Cash[4]))
-    cash_value[1].insert(0, '{:,}'.format(Cash[5]))
-    cash_value[6].insert(0, '{:,}'.format(Total_Cash))
-    
-    output_value1[2].insert(0, '{:,}'.format(Total_Cash))
-    output_value1[3].insert(0, '{:,}'.format(Total_Hand))
-    output_value2[0].insert(0, '{:,}'.format(r_p_closing))
-    output_value2[5].insert(0, '{:,}'.format(Total_Comp))
-     
-    balance_value.insert(0, '{:,}'.format(Total_Hand - Total_Comp))
+    reset()
 
-    for el in (output_value):   el.config(state='readonly')
-    for el in (cash_value):   el.config(state='readonly')
-    balance_value.config(state='readonly')
-    r_p_value[6].config(state='readonly')
+    # Insert Value
+    insert_name = {cash_value[0] : Cash[4], cash_value[1] : Cash[5], cash_value[6] : Total_Cash,
+                   output_value1[2] : Total_Cash, output_value1[3] : Total_Hand, output_value2[0] : r_p_closing, output_value2[5] : Total_Comp,
+                   balance_value : Total_Hand - Total_Comp}
     
+    for i in range(2):
+        if Total[i] != 0: insert_value(output_value1[i], Total[i])
+                    
+    for i in range(2,6):
+        if Total[i] != 0: insert_value(output_value2[i-1], Total[i])
+        
+    for i,vl in enumerate(R_P[:-1]): insert_value(r_p_value[i], int(vl))
+    insert_value(r_p_value[6], r_p_closing)
+    
+    for ii,i in enumerate(range(2,6)): insert_value(cash_value[i], Cash[ii])
+        
+    for cell, vl in insert_name.items(): insert_value(cell, vl)
+
+    # Convert to Readonly
+    for el in (output_value): convert_readonly(el)
+    for el in (cash_value): convert_readonly(el)
+    convert_readonly(balance_value)
+    convert_readonly(r_p_value[6])
+       
     
 def reset():
-    
-    for el in output_value:   el.config(state='normal')
-    for el in cash_value:   el.config(state='normal')
-    balance_value.config(state='normal')
-    r_p_value[6].config(state='normal')
-    
-    for el in (input_entry + output_value):  el.delete(0, tkinter.END)
-    for el in (cash_value):  el.delete(0, tkinter.END)
-    for el in (r_p_value):  el.delete(0, tkinter.END)
-    balance_value.delete(0, tkinter.END)
-  
+                     
+    # Convert to Normal
+    for el in output_value: convert_normal(el)
+    for el in cash_value: convert_normal(el)
+    convert_normal(balance_value)
+    convert_normal(r_p_value[6])
+
+    # Delete Value
+    for el in (input_entry + output_value): delete_value(el)
+    for el in (cash_value): delete_value(el)
+    for el in (r_p_value): delete_value(el)
+    delete_value(balance_value)
+      
 
 def submit():
 
@@ -175,7 +187,9 @@ if __name__ == "__main__":
     output2_name = [" R/P (C/D)", " T. Bill"," T. Loan: R.", " T. Loan: PCT", " T. Income V.", " Total (Comp.)"]
 
     cash_name = [" Bundle L.", " Bundle S."," 1000", " 500", " 100", " Others"," Total (Cash)"]
-    r_p_name = [" R/P (B/D)", " I.V. & Loan"," Bill (Pre)", " Reception I.", " Pharmacy I.", " Posted V."," R/P (C/D)"]
+    cash_detail = ["  1000 X ","  500 X ","  100 X "]
+    
+    r_p_name = [" R/P (B/D)", " (+) I.V. & Loan"," (+) Bill (Pre)", " (+) Reception I.", " (+) Pharmacy I.", " (-) Posted V."," R/P (C/D)"]
 
     styleOpts1 = { 'width' : 12,  'justify' : 'center' }
     styleBold = { 'font' : 'Helvetica 8 bold'}
@@ -191,10 +205,10 @@ if __name__ == "__main__":
     input_entry2 = [tkinter.Entry(input_frame, textvariable=name+"_var",  bg='#d3d4d8', **styleOpts1) for name in input2_name]
     
     output_label1 = [tkinter.Label(output_frame, text=name, width=12,  anchor="w", bg='#ffa5a5') for name in output1_name]
-    output_label2 = [tkinter.Label(output_frame, text=name, width=12,  anchor="w", bg='#eab4f8') for name in output2_name]
+    output_label2 = [tkinter.Label(output_frame, text=name, width=13,  anchor="w", bg='#eab4f8') for name in output2_name]
 
     cash_label = [tkinter.Label(output_frame, text=name, width=12,  anchor="w", bg='#4ecca3') for name in cash_name]
-    r_p_label = [tkinter.Label(output_frame, text=name, width=12,  anchor="w", bg='#71c9ce') for name in r_p_name]
+    r_p_label = [tkinter.Label(output_frame, text=name, width=13,  anchor="w", bg='#71c9ce') for name in r_p_name]
     
     output_value1 = [tkinter.Entry(output_frame, state='readonly', **styleOpts1) for name in output1_name]
     output_value2 = [tkinter.Entry(output_frame, state='readonly', **styleOpts1) for name in output2_name]
