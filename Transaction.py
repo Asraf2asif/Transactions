@@ -314,11 +314,11 @@ if __name__ == "__main__":
       
     search_id_vl = last_id()
     search_id =  tkinter.Label(input_frame, text=str(search_id_vl), width=6, pady=6, anchor="s", bg='#eaeaea')
-
     
     def search():
         
         placement(element=search_id, row=0, column=5,  pady=(10,20), padx=(30,0))
+        search_id.config(relief="flat")
         
         search_id.config(text=str(search_id_vl))
 
