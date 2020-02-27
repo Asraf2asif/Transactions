@@ -4,6 +4,7 @@ import sqlite3
 from collections import Counter
 from datetime import date
 
+int('1,000,000'.replace(',',''))
 
 def placement(element, row=0, column=0,  sticky='nw', padx=(10,0), pady=(0,0), ipady=0, border=2, relief='groove'):
         element.grid(row=row, column=column, sticky=sticky, padx=padx, pady=pady, ipady=ipady)
@@ -19,8 +20,11 @@ def placement_output_entry(el, column, padx=(10,0), pady=(10,0)):
 
 
 def gen_value(cell):
+    ts = [el.get() for el in cell if el]
+    print(ts)
     input_value = [input_regex.search(el.get()) for el in cell if el]
     value = [float(vl.group()) if vl else 0 for vl in  input_value]
+    print(value)
     return value
 
   
@@ -33,6 +37,7 @@ def gen_query(col, table):
 
     
 def r_p_input():
+    
     value = gen_value(r_p_value[0:-1])
 
     for i,vl in enumerate(value): value[i] = int(value[i])
@@ -68,6 +73,9 @@ def sum_col(col, table, arr):
 
 def insert_value(insert_cell, insert_vl):
     insert_cell.insert(0, '{:,}'.format(insert_vl))
+
+def insert_value_rp(insert_cell, insert_vl):
+    insert_cell.insert(0, insert_vl)
     
 def convert_readonly(el):
     el.config(state='readonly')
@@ -97,8 +105,8 @@ def total():
    
     cur.execute('SELECT * FROM "{}" ORDER BY "ID" DESC LIMIT 1'.format(r_p_table))
     try: R_P = cur.fetchall()[0][1:]
-    except: print("No Entry To Sum1") 
-
+    except: print("No Entry To Sum1")
+    
     # Cash Details
     for ii,i in enumerate(range(2,5)): cash_label[i].config(text= cash_detail[ii] + str(Cash[ii]))
     
@@ -127,7 +135,7 @@ def total():
     for i in range(2,6):
         if Total[i] != 0: insert_value(output_value2[i-1], Total[i])
         
-    for i,vl in enumerate(R_P[:-1]): insert_value(r_p_value[i], int(vl))
+    for i,vl in enumerate(R_P[:-1]): insert_value_rp(r_p_value[i], int(vl))
     insert_value(r_p_value[6], r_p_closing)
     
     for ii,i in enumerate(range(2,6)): insert_value(cash_value[i], Cash[ii])
@@ -305,7 +313,7 @@ if __name__ == "__main__":
         return search_id_vl
       
     search_id_vl = last_id()
-    search_id =  tkinter.Label(input_frame, text=str(search_id_vl), width=10, pady=5, anchor="s", bg='#71c9ce')
+    search_id =  tkinter.Label(input_frame, text=str(search_id_vl), width=10, pady=5, anchor="s", bg='#eaeaea')
 
     
     def search():
@@ -351,7 +359,7 @@ if __name__ == "__main__":
 
     def previous_entry():
         global search_id_vl
-        if search_id_vl != 0:
+        if search_id_vl != 1:
           search_id_vl -=1
           search()
 
@@ -369,21 +377,25 @@ if __name__ == "__main__":
         search_id_vl =last_id()
         search()
         
-    search_button = tkinter.Button(input_frame, text="Search", width=10, height=1, command=last_entry, bg='#1891ac', fg='white', cursor="hand2")
-    placement(element=search_button, row=0, column=0,  pady=(0,30), ipady=2)
+    img_search=tkinter.PhotoImage(file="Search-icon.png")   
+    search_button = tkinter.Button(input_frame, text="Search", command=last_entry, bg='white', fg='white', cursor="hand2", image=img_search)
+    placement(element=search_button, row=0, column=0, padx=(30,0),  pady=(0,0), ipady=2)
 
-    update_button = tkinter.Button(input_frame, text="Save", width=10, height=1, command=update, bg='#1891ac', fg='white', cursor="hand2")
-    placement(element=update_button, row=0, column=1,  pady=(0,0), ipady=2)
+    img_update=tkinter.PhotoImage(file="Save-icon.png")
+    update_button = tkinter.Button(input_frame, text="", compound=tkinter.LEFT, command=update, bg='white', fg='white', cursor="hand2", image=img_update)
+    placement(element=update_button, row=0, column=1,  padx=(30,0), pady=(0,0), ipady=2)
+
+    img_previous=tkinter.PhotoImage(file="Previous-icon.png")
+    previous_button = tkinter.Button(input_frame, text="Previous", command=previous_entry, width=49,height=39, bg='white', fg='white', cursor="hand2", image=img_previous)
+    placement(element=previous_button, row=0, column=2,  padx=(30,0), pady=(0,0), ipady=2)
     
-    previous_button = tkinter.Button(input_frame, text="Previous", width=10, height=1, command=previous_entry, bg='#1891ac', fg='white', cursor="hand2")
-    placement(element=previous_button, row=0, column=2,  pady=(0,0), ipady=2)
+    img_next=tkinter.PhotoImage(file="Next-icon.png")
+    next_button = tkinter.Button(input_frame, text="Next", command=next_entry, width=49,height=39, bg='white', fg='white', cursor="hand2", image=img_next)
+    placement(element=next_button, row=0, column=3,padx=(30,0),  pady=(0,0), ipady=2)
 
-    next_button = tkinter.Button(input_frame, text="Next", width=10, height=1, command=next_entry, bg='#1891ac', fg='white', cursor="hand2")
-    placement(element=next_button, row=0, column=3,  pady=(0,0), ipady=2)
-
-
-    refresh_button = tkinter.Button(input_frame, text="Refresh", width=10, height=1, command=total, bg='#1891ac', fg='white', cursor="hand2")
-    placement(element=refresh_button, row=0, column=4,  pady=(0,30), ipady=2)
+    img_refresh=tkinter.PhotoImage(file="Refresh-icon.png")
+    refresh_button = tkinter.Button(input_frame, text="Refresh", command=total, bg='white', fg='white', cursor="hand2", image=img_refresh)
+    placement(element=refresh_button, row=0, column=4,padx=(30,0),  pady=(0,15), ipady=2)
 
     
     
