@@ -6,8 +6,8 @@ from datetime import date
 
 int('1,000,000'.replace(',',''))
 
-def placement(element, row=0, column=0,  sticky='nw', padx=(10,0), pady=(0,0), ipady=0, border=2, relief='groove'):
-        element.grid(row=row, column=column, sticky=sticky, padx=padx, pady=pady, ipady=ipady)
+def placement(element, row=0, column=0,  sticky='nw', padx=(10,0), pady=(0,0), ipady=0, border=2, relief='groove', columnspan=1):
+        element.grid(row=row, column=column, sticky=sticky, padx=padx, pady=pady, ipady=ipady, columnspan=columnspan)
         element.config(border=border, relief=relief)
 
 
@@ -313,12 +313,12 @@ if __name__ == "__main__":
         return search_id_vl
       
     search_id_vl = last_id()
-    search_id =  tkinter.Label(input_frame, text=str(search_id_vl), width=10, pady=5, anchor="s", bg='#eaeaea')
+    search_id =  tkinter.Label(input_frame, text=str(search_id_vl), width=6, pady=6, anchor="s", bg='#eaeaea')
 
     
     def search():
         
-        placement(element=search_id, row=0, column=5,  pady=(0,20))
+        placement(element=search_id, row=0, column=5,  pady=(10,20), padx=(30,0))
         
         search_id.config(text=str(search_id_vl))
 
@@ -378,24 +378,28 @@ if __name__ == "__main__":
         search()
         
     img_search=tkinter.PhotoImage(file="Search-icon.png")   
-    search_button = tkinter.Button(input_frame, text="Search", command=last_entry, bg='white', fg='white', cursor="hand2", image=img_search)
-    placement(element=search_button, row=0, column=0, padx=(30,0),  pady=(0,0), ipady=2)
+    search_button = tkinter.Button(input_frame, text="Search", command=last_entry, bg='white', fg='#eaeaea', cursor="hand2", image=img_search)
+    placement(element=search_button, row=0, column=0, padx=(60,0),  pady=(0,0), ipady=2, columnspan=6)
 
     img_update=tkinter.PhotoImage(file="Save-icon.png")
     update_button = tkinter.Button(input_frame, text="", compound=tkinter.LEFT, command=update, bg='white', fg='white', cursor="hand2", image=img_update)
-    placement(element=update_button, row=0, column=1,  padx=(30,0), pady=(0,0), ipady=2)
+    placement(element=update_button, row=0, column=0,  padx=(120,0), pady=(0,0), ipady=2, columnspan=6)
 
     img_previous=tkinter.PhotoImage(file="Previous-icon.png")
-    previous_button = tkinter.Button(input_frame, text="Previous", command=previous_entry, width=49,height=39, bg='white', fg='white', cursor="hand2", image=img_previous)
-    placement(element=previous_button, row=0, column=2,  padx=(30,0), pady=(0,0), ipady=2)
+    previous_button = tkinter.Button(input_frame, text="Previous", command=previous_entry, bg='white', fg='white', cursor="hand2", image=img_update)
+    placement(element=previous_button, row=0, column=0,  padx=(180,0), pady=(0,0), ipady=2, columnspan=6)
     
     img_next=tkinter.PhotoImage(file="Next-icon.png")
-    next_button = tkinter.Button(input_frame, text="Next", command=next_entry, width=49,height=39, bg='white', fg='white', cursor="hand2", image=img_next)
-    placement(element=next_button, row=0, column=3,padx=(30,0),  pady=(0,0), ipady=2)
+    next_button = tkinter.Button(input_frame, text="Next", command=next_entry,bg='white', fg='white', cursor="hand2", image=img_update)
+    placement(element=next_button, row=0, column=0,padx=(240,0),  pady=(0,0), ipady=2, columnspan=6)
 
     img_refresh=tkinter.PhotoImage(file="Refresh-icon.png")
     refresh_button = tkinter.Button(input_frame, text="Refresh", command=total, bg='white', fg='white', cursor="hand2", image=img_refresh)
-    placement(element=refresh_button, row=0, column=4,padx=(30,0),  pady=(0,15), ipady=2)
+    placement(element=refresh_button, row=0, column=0,padx=(300,0),  pady=(0,15), ipady=2, columnspan=6)
+
+
+    refresh_button = tkinter.Button(input_frame, text="Refresh", command=total, bg='white', fg='white', cursor="hand2", image=img_refresh)
+    placement(element=refresh_button, row=0, column=0,padx=(360,0),  pady=(0,15), ipady=2, columnspan=6)
 
     
     
