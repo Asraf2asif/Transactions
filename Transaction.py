@@ -377,28 +377,28 @@ if __name__ == "__main__":
         search_id_vl =last_id()
         search()
         
-    img_search=tkinter.PhotoImage(file="Search-icon.png")   
-    search_button = tkinter.Button(input_frame, text="Search", command=last_entry, bg='white', fg='#eaeaea', cursor="hand2", image=img_search)
+    img_search=tkinter.PhotoImage(file="icon/Search-icon.png")   
+    search_button = tkinter.Button(input_frame, text="Search", command=last_entry, width= 45, height=41,  bg='#eaeaea', cursor="hand2", image=img_search)
     placement(element=search_button, row=0, column=0, padx=(60,0),  pady=(0,0), ipady=2, columnspan=6)
 
-    img_update=tkinter.PhotoImage(file="Save-icon.png")
-    update_button = tkinter.Button(input_frame, text="", compound=tkinter.LEFT, command=update, bg='white', fg='white', cursor="hand2", image=img_update)
+    img_update=tkinter.PhotoImage(file="icon/Save-icon.png")
+    update_button = tkinter.Button(input_frame, text="", compound=tkinter.LEFT, command=update, width= 45, height=41,  bg='#eaeaea', cursor="hand2", image=img_update)
     placement(element=update_button, row=0, column=0,  padx=(120,0), pady=(0,0), ipady=2, columnspan=6)
 
-    img_previous=tkinter.PhotoImage(file="Previous-icon.png")
-    previous_button = tkinter.Button(input_frame, text="Previous", command=previous_entry, bg='white', fg='white', cursor="hand2", image=img_update)
+    img_previous=tkinter.PhotoImage(file="icon/Previous-icon.png")
+    previous_button = tkinter.Button(input_frame, text="Previous", command=previous_entry, width= 45, height=41,  bg='#eaeaea', cursor="hand2", image=img_previous)
     placement(element=previous_button, row=0, column=0,  padx=(180,0), pady=(0,0), ipady=2, columnspan=6)
     
-    img_next=tkinter.PhotoImage(file="Next-icon.png")
-    next_button = tkinter.Button(input_frame, text="Next", command=next_entry,bg='white', fg='white', cursor="hand2", image=img_update)
+    img_next=tkinter.PhotoImage(file="icon/Next-icon.png")
+    next_button = tkinter.Button(input_frame, text="Next", command=next_entry, width= 45, height=41, bg='#eaeaea', cursor="hand2", image=img_next)
     placement(element=next_button, row=0, column=0,padx=(240,0),  pady=(0,0), ipady=2, columnspan=6)
 
-    img_refresh=tkinter.PhotoImage(file="Refresh-icon.png")
-    refresh_button = tkinter.Button(input_frame, text="Refresh", command=total, bg='white', fg='white', cursor="hand2", image=img_refresh)
+    img_refresh=tkinter.PhotoImage(file="icon/Refresh-icon.png")
+    refresh_button = tkinter.Button(input_frame, text="Refresh", command=total, width= 45, height=41, bg='#eaeaea', cursor="hand2", image=img_refresh)
     placement(element=refresh_button, row=0, column=0,padx=(300,0),  pady=(0,15), ipady=2, columnspan=6)
 
-
-    refresh_button = tkinter.Button(input_frame, text="Refresh", command=total, bg='white', fg='white', cursor="hand2", image=img_refresh)
+    img_delete=tkinter.PhotoImage(file="icon/Delete-icon.png")
+    refresh_button = tkinter.Button(input_frame, text="Refresh", command=total, width= 45, height=41,  bg='#eaeaea', cursor="hand2", image=img_delete)
     placement(element=refresh_button, row=0, column=0,padx=(360,0),  pady=(0,15), ipady=2, columnspan=6)
 
     
