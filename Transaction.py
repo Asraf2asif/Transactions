@@ -6,6 +6,7 @@ from datetime import date
 
 int('1,000,000'.replace(',',''))
 
+
 def placement(element, row=0, column=0,  sticky='nw', padx=(10,0), pady=(0,0), ipady=0, border=2, relief='groove', columnspan=1):
         element.grid(row=row, column=column, sticky=sticky, padx=padx, pady=pady, ipady=ipady, columnspan=columnspan)
         element.config(border=border, relief=relief)
@@ -21,10 +22,10 @@ def placement_output_entry(el, column, padx=(10,0), pady=(10,0)):
 
 def gen_value(cell):
     ts = [el.get() for el in cell if el]
-    print(ts)
+
     input_value = [input_regex.search(el.get()) for el in cell if el]
     value = [float(vl.group()) if vl else 0 for vl in  input_value]
-    print(value)
+
     return value
 
   
@@ -71,20 +72,41 @@ def sum_col(col, table, arr):
     cur.execute('SELECT sum("{}") FROM "{}"'.format(col, table))
     arr.append(int(cur.fetchone()[0]))
 
+
 def insert_value(insert_cell, insert_vl):
     insert_cell.insert(0, '{:,}'.format(insert_vl))
 
+
 def insert_value_rp(insert_cell, insert_vl):
     insert_cell.insert(0, insert_vl)
+
     
 def convert_readonly(el):
     el.config(state='readonly')
+
     
 def convert_normal(el):
     el.config(state='normal')
 
+
 def delete_value(el):
     el.delete(0, tkinter.END)
+
+
+def convert_readonly_el():
+    readonly_el = output_value1 + output_value2 + cash_value + [balance_value] + [r_p_value[6]]
+    for el in readonly_el: convert_readonly(el)
+
+
+def convert_normal_el():
+    normal_el = output_value1 + output_value2 + cash_value + [balance_value] + [r_p_value[6]]
+    for el in normal_el: convert_normal(el)
+
+
+def convert_delete_el():
+    delete_el = input_entry + output_value + cash_value + r_p_value + [balance_value]
+    for el in delete_el: delete_value(el)
+
 
 def total():
     # Arry
@@ -142,32 +164,17 @@ def total():
         
     for cell, vl in insert_name.items(): insert_value(cell, vl)
 
-    # Convert to Readonly
-    for el in (output_value): convert_readonly(el)
-    for el in (cash_value): convert_readonly(el)
-    convert_readonly(balance_value)
-    convert_readonly(r_p_value[6])
+    convert_readonly_el()
      
     search_id.grid_forget()
 
     
-def reset():
-                     
-    # Convert to Normal
-    for el in output_value: convert_normal(el)
-    for el in cash_value: convert_normal(el)
-    convert_normal(balance_value)
-    convert_normal(r_p_value[6])
-
-    # Delete Value
-    for el in (input_entry + output_value): delete_value(el)
-    for el in (cash_value): delete_value(el)
-    for el in (r_p_value): delete_value(el)
-    delete_value(balance_value)
+def reset():             
+    convert_normal_el()
+    convert_delete_el()
       
 
-def submit():
-
+def submit():   
     insert_input()
     r_p_input()
 
@@ -178,16 +185,6 @@ def submit():
 
 
 if __name__ == "__main__":
-    mainWindow = tkinter.Tk()
-    mainWindow.config(bg='#eaeaea')
-    mainWindow.title("Transaction:-  EPK International (Pvt) Ltd.")
-    mainWindow.geometry('1165x680+30+0')
-
-
-# Frame
-    input_frame = tkinter.Frame(mainWindow, bg='#eaeaea')
-    output_frame = tkinter.Frame(mainWindow, bg='#eaeaea')
-
 
 # Name
     input1_name = ["1000","500","100","-","Suspension","Voucher"]
@@ -203,33 +200,80 @@ if __name__ == "__main__":
 
     styleOpts1 = { 'width' : 12,  'justify' : 'center' }
     styleBold = { 'font' : 'Helvetica 8 bold'}
-    styleID = { 'width' : 12, 'font' : 'Helvetica 8 bold'}
+    styleIW = {'width' : 10}
+    styleID = { 'width' : styleOpts1['width'], 'font' : styleBold['font']}
 
     input_regex = re.compile (r'^[-+]?[\d]*\.?[\d]+$')
 
+    color =  ['#eaeaea', '#71c9ce', '#d3d4d8', '#ffa5a5', '#eab4f8', '#4ecca3']
 
-# Element
-    input_button1 = [tkinter.Button(input_frame, text=name, width=10, height=1, bg='#71c9ce', fg='black', cursor="hand2") for name in input1_name]
-    input_button2 = [tkinter.Button(input_frame, text=name, width=10, height=1, bg='#71c9ce', cursor="hand2") for name in input2_name]
 
-    input_entry1 = [tkinter.Entry(input_frame, textvariable=name+"_var",  bg='#d3d4d8', **styleOpts1) for name in input1_name]
-    input_entry2 = [tkinter.Entry(input_frame, textvariable=name+"_var",  bg='#d3d4d8', **styleOpts1) for name in input2_name]
-    
-    output_label1 = [tkinter.Label(output_frame, text=name, width=12,  anchor="w", bg='#ffa5a5') for name in output1_name]
-    output_label2 = [tkinter.Label(output_frame, text=name, width=13,  anchor="w", bg='#eab4f8') for name in output2_name]
 
-    cash_label = [tkinter.Label(output_frame, text=name, width=12,  anchor="w", bg='#4ecca3') for name in cash_name]
-    r_p_label = [tkinter.Label(output_frame, text=name, width=13,  anchor="w", bg='#71c9ce') for name in r_p_name]
-    
-    output_value1 = [tkinter.Entry(output_frame, state='readonly', **styleOpts1) for name in output1_name]
-    output_value2 = [tkinter.Entry(output_frame, state='readonly', **styleOpts1) for name in output2_name]
+# Main  Window  
+    mainWindow = tkinter.Tk()
+    mainWindow.config(bg='#eaeaea')
+    mainWindow.title("Transaction:-  EPK International (Pvt) Ltd.")
+    mainWindow.geometry('1165x680+30+0')
 
-    cash_value = [tkinter.Entry(output_frame, state='readonly', **styleOpts1) for name in cash_name]
-    r_p_value = [tkinter.Entry(output_frame, **styleOpts1) for name in r_p_name]
+
+# Frame
+    input_frame = tkinter.Frame(mainWindow, bg=color[0])
+    output_frame = tkinter.Frame(mainWindow, bg=color[0])
+
+
+    def arrayCalc(arr, fn):
+        arrRes = [fn(name) for name in arr]
+        return arrRes
+
+    def create_input_button(name):
+        return tkinter.Button(input_frame, text=name,  height=1, cursor="hand2", **styleIW)
+
+    def create_input_entry(name):
+        return tkinter.Entry(input_frame, textvariable=name+"_var", **styleOpts1)
+
+    def create_input_entry2(name):
+        return tkinter.Entry(output_frame, textvariable=name+"_var", **styleOpts1)
+
+    def create_input_entryRP(name):
+        return tkinter.Entry(output_frame, **styleOpts1)
+
+    def create_output_label(name):
+        return tkinter.Label(output_frame, text=name, width=styleOpts1['width'],  anchor="w")
         
+# Element
+    input_button1 = arrayCalc(input1_name, create_input_button)
+    input_button2 = arrayCalc(input2_name, create_input_button)
+
+    input_entry1 = arrayCalc(input1_name, create_input_entry)
+    input_entry2 = arrayCalc(input2_name, create_input_entry)
+    
+    output_label1 = arrayCalc(output1_name, create_output_label)
+    output_label2 = arrayCalc(output2_name, create_output_label)
+    
+    cash_label = arrayCalc(cash_name, create_output_label)
+    r_p_label = arrayCalc(r_p_name, create_output_label)
+        
+    output_value1 = arrayCalc(output1_name, create_input_entry2)
+    output_value2 = arrayCalc(output2_name, create_input_entry2)
+
+    cash_value = arrayCalc(cash_name, create_input_entry2)
+    r_p_value =  arrayCalc(r_p_name, create_input_entryRP)
+    
     thousand_shorthand_var = tkinter.IntVar()
-    thousand_shorthand =  tkinter.Checkbutton(input_frame, text="(000)?", variable=thousand_shorthand_var, bg='#4ecca3', cursor="hand2")
-    placement(element=thousand_shorthand, row=5, column=1,  pady=(30,0))
+    thousand_shorthand =  tkinter.Checkbutton(input_frame, text="(000)?", variable=thousand_shorthand_var, bg=color[5], cursor="hand2")
+
+    balance_button = tkinter.Button(output_frame, text="Balance", width=11, anchor="w", bg='#f3f798', cursor="hand2")
+    balance_value = tkinter.Entry(output_frame, width=12,  justify='center',  state='readonly', **styleBold )
+
+    submit_button = tkinter.Button(input_frame, text="Submit", width=10, height=1, command=submit, bg='#1891ac', fg='white', cursor="hand2")
+    
+    # Color
+    for el in input_button1+input_button2: el.config(bg=color[1])
+    for el in input_entry1+input_entry2: el.config(bg=color[2])
+    for el in output_label1: el.config(bg=color[3])
+    for el in output_label2: el.config(bg=color[4])
+    for el in cash_label: el.config(bg=color[5])
+    for el in r_p_label: el.config(bg=color[1])
     
     input_name = input1_name + input2_name
     input_entry = input_entry1 + input_entry2
@@ -237,13 +281,12 @@ if __name__ == "__main__":
     
     output_name = output1_name + output2_name
     output_value = output_value1 + output_value2
-    
-    output_value1[3].config(**styleBold)
-    output_value2[5].config(**styleBold)
-    cash_value[6].config(**styleBold)
-    r_p_value[6].config(state='readonly', **styleBold)
-    
 
+    bold_el = [output_value1[3], output_value2[5], cash_value[6]]
+    for el in bold_el: el.config(**styleBold)
+    
+    convert_readonly_el()
+    
 # Database
     today = date.today()
     date = today.strftime("%b-%d-%Y")
@@ -293,20 +336,16 @@ if __name__ == "__main__":
         i+=len(output_label2) + 1
         placement_output_entry(rpl, column=2, padx=(40,0), pady=((40,0) if i==7 else (10,0)))
         placement_output_entry(rpv, column=3, pady=((40,0) if i==7 else (10,0)))
-    
-# Balance Button & Value
-    balance_button = tkinter.Button(output_frame, text="Balance", width=11, anchor="w", bg='#f3f798', cursor="hand2")
-    balance_value = tkinter.Entry(output_frame, width=12,  justify='center',  state='readonly', **styleBold )
+
+    placement(element=thousand_shorthand, row=5, column=1,  pady=(30,0))
     
     placement(element=balance_value, row=len(output_label1)+1, column=1,  pady=(10,0), ipady=4)
     placement(element=balance_button, row=len(output_value1)+1, column=0,  pady=(10,0), ipady=2)
-
     
-# Submit Button
-    submit_button = tkinter.Button(input_frame, text="Submit", width=10, height=1, command=submit, bg='#1891ac', fg='white', cursor="hand2")
     placement(element=submit_button, row=5, column=5,  pady=(30,0), ipady=2)
+        
     
-# Search
+# Search (messy, latter must be fixed)
     def last_id():
         cur.execute('SELECT MAX("ID") from "{}"'.format(table_name))
         search_id_vl = int(cur.fetchall()[0][0])
@@ -314,9 +353,9 @@ if __name__ == "__main__":
       
     search_id_vl = last_id()
     search_id =  tkinter.Label(input_frame, text=str(search_id_vl), width=6, pady=6, anchor="s", bg='#eaeaea')
+
     
     def search():
-        
         placement(element=search_id, row=0, column=5,  pady=(10,20), padx=(30,0))
         search_id.config(relief="flat")
         
@@ -328,12 +367,10 @@ if __name__ == "__main__":
         for i, el in enumerate(input_entry):
           el.delete(0, tkinter.END)
           if search_value[i]!=0:
-              el.insert(0, int(search_value[i]))
-              
+              el.insert(0, int(search_value[i]))              
     
       
     def update():
-        
         input_value = [input_regex.search(el.get()) for el in input_entry if el]
         value = [float(vl.group()) if vl else 0 for vl in  input_value]
 
@@ -376,32 +413,33 @@ if __name__ == "__main__":
 
         search_id_vl =last_id()
         search()
-        
-    img_search=tkinter.PhotoImage(file="icon/Search-icon.png")   
+
+    # img location    
+    img_search=tkinter.PhotoImage(file="icon/Search-icon.png")
+    img_update=tkinter.PhotoImage(file="icon/Save-icon.png")
+    img_previous=tkinter.PhotoImage(file="icon/Previous-icon.png")
+    img_next=tkinter.PhotoImage(file="icon/Next-icon.png")
+    img_refresh=tkinter.PhotoImage(file="icon/Refresh-icon.png")
+    img_delete=tkinter.PhotoImage(file="icon/Delete-icon.png")
+    
     search_button = tkinter.Button(input_frame, text="Search", command=last_entry, width= 45, height=41,  bg='#eaeaea', cursor="hand2", image=img_search)
     placement(element=search_button, row=0, column=0, padx=(60,0),  pady=(0,0), ipady=2, columnspan=6)
-
-    img_update=tkinter.PhotoImage(file="icon/Save-icon.png")
+    
     update_button = tkinter.Button(input_frame, text="", compound=tkinter.LEFT, command=update, width= 45, height=41,  bg='#eaeaea', cursor="hand2", image=img_update)
     placement(element=update_button, row=0, column=0,  padx=(120,0), pady=(0,0), ipady=2, columnspan=6)
-
-    img_previous=tkinter.PhotoImage(file="icon/Previous-icon.png")
-    previous_button = tkinter.Button(input_frame, text="Previous", command=previous_entry, width= 45, height=41,  bg='#eaeaea', cursor="hand2", image=img_previous)
-    placement(element=previous_button, row=0, column=0,  padx=(180,0), pady=(0,0), ipady=2, columnspan=6)
     
-    img_next=tkinter.PhotoImage(file="icon/Next-icon.png")
+    previous_button = tkinter.Button(input_frame, text="Previous", command=previous_entry, width= 45, height=41,  bg='#eaeaea', cursor="hand2", image=img_previous)
+    placement(element=previous_button, row=0, column=0,  padx=(180,0), pady=(0,0), ipady=2, columnspan=6)  
+    
     next_button = tkinter.Button(input_frame, text="Next", command=next_entry, width= 45, height=41, bg='#eaeaea', cursor="hand2", image=img_next)
     placement(element=next_button, row=0, column=0,padx=(240,0),  pady=(0,0), ipady=2, columnspan=6)
-
-    img_refresh=tkinter.PhotoImage(file="icon/Refresh-icon.png")
+    
     refresh_button = tkinter.Button(input_frame, text="Refresh", command=total, width= 45, height=41, bg='#eaeaea', cursor="hand2", image=img_refresh)
     placement(element=refresh_button, row=0, column=0,padx=(300,0),  pady=(0,15), ipady=2, columnspan=6)
 
-    img_delete=tkinter.PhotoImage(file="icon/Delete-icon.png")
     refresh_button = tkinter.Button(input_frame, text="Refresh", command=total, width= 45, height=41,  bg='#eaeaea', cursor="hand2", image=img_delete)
     placement(element=refresh_button, row=0, column=0,padx=(360,0),  pady=(0,15), ipady=2, columnspan=6)
 
-    
     
         
     try:  
