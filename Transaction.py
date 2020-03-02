@@ -4,7 +4,8 @@ import sqlite3
 from collections import Counter
 from datetime import date
 
-int('1,000,000'.replace(',',''))
+print(int('1,000,000'.replace(',','')))
+
 
 
 def placement(element, row=0, column=0,  sticky='nw', padx=(10,0), pady=(0,0), ipady=0, border=2, relief='groove', columnspan=1):
@@ -23,7 +24,7 @@ def placement_output_entry(el, column, padx=(10,0), pady=(10,0)):
 def gen_value(cell):
     ts = [el.get() for el in cell if el]
 
-    input_value = [input_regex.search(el.get()) for el in cell if el]
+    input_value = [input_regex.search(el.get().replace(',','')) for el in cell if el]
     value = [float(vl.group()) if vl else 0 for vl in  input_value]
 
     return value
@@ -46,6 +47,14 @@ def r_p_input():
     query = gen_query(r_p_name[0:-1], r_p_table)
     
     cur.execute(query, ([i for i in value]))
+
+    con.commit()
+
+def r_p_input_init():
+        
+    query = gen_query(r_p_name[0:-1], r_p_table)
+    
+    cur.execute(query, ([0 for i in r_p_name[0:-1]]))
 
     con.commit()
 
@@ -157,7 +166,7 @@ def total():
     for i in range(2,6):
         if Total[i] != 0: insert_value(output_value2[i-1], Total[i])
         
-    for i,vl in enumerate(R_P[:-1]): insert_value_rp(r_p_value[i], int(vl))
+    for i,vl in enumerate(R_P[:-1]): insert_value(r_p_value[i], int(vl))
     insert_value(r_p_value[6], r_p_closing)
     
     for ii,i in enumerate(range(2,6)): insert_value(cash_value[i], Cash[ii])
@@ -177,7 +186,7 @@ def reset():
 def submit():   
     insert_input()
     r_p_input()
-
+       
     try:  
         total()
     except:
@@ -282,7 +291,7 @@ if __name__ == "__main__":
     output_name = output1_name + output2_name
     output_value = output_value1 + output_value2
 
-    bold_el = [output_value1[3], output_value2[5], cash_value[6]]
+    bold_el = [output_value1[3], output_value2[5], cash_value[6], r_p_value[6]]
     for el in bold_el: el.config(**styleBold)
     
     convert_readonly_el()
@@ -306,6 +315,7 @@ if __name__ == "__main__":
                             "{0[0]}" REAL, "{0[1]}" REAL, "{0[2]}" REAL,"{0[3]}" REAL, "{0[4]}" REAL, "{0[5]}" REAL, "{0[6]}" REAL)"""
                              .format(r_p_name, r_p_table))
     
+        
 
  # Placement     
     input_frame.grid(row=0, column=0, padx=(30,100), pady=(15,305))
@@ -348,7 +358,10 @@ if __name__ == "__main__":
 # Search (messy, latter must be fixed)
     def last_id():
         cur.execute('SELECT MAX("ID") from "{}"'.format(table_name))
-        search_id_vl = int(cur.fetchall()[0][0])
+        try:
+            search_id_vl = int(cur.fetchall()[0][0])
+        except:
+            search_id_vl = 0
         return search_id_vl
       
     search_id_vl = last_id()
@@ -367,11 +380,12 @@ if __name__ == "__main__":
         for i, el in enumerate(input_entry):
           el.delete(0, tkinter.END)
           if search_value[i]!=0:
-              el.insert(0, int(search_value[i]))              
+              insert_value(el, int(search_value[i]))
+              #el.insert(0, int(search_value[i]))              
     
       
     def update():
-        input_value = [input_regex.search(el.get()) for el in input_entry if el]
+        input_value = [input_regex.search(el.get().replace(',','')) for el in input_entry if el]
         value = [float(vl.group()) if vl else 0 for vl in  input_value]
 
         for i,vl in enumerate(value):
@@ -440,12 +454,11 @@ if __name__ == "__main__":
     refresh_button = tkinter.Button(input_frame, text="Refresh", command=total, width= 45, height=41,  bg='#eaeaea', cursor="hand2", image=img_delete)
     placement(element=refresh_button, row=0, column=0,padx=(360,0),  pady=(0,15), ipady=2, columnspan=6)
 
-    
         
     try:  
         total()
     except:
         print("No Entry To Sum")
-
+    
         
     mainWindow.mainloop()
