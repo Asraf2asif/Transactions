@@ -3,12 +3,7 @@ import re
 import sqlite3
 from collections import Counter
 from datetime import date
-
-
-def placement(element, row=0, column=0, sticky='nw', padx=(10, 0), pady=(0, 0), ipady=0, border=2, relief='groove',
-              columnspan=1):
-    element.grid(row=row, column=column, sticky=sticky, padx=padx, pady=pady, ipady=ipady, columnspan=columnspan)
-    element.config(border=border, relief=relief)
+from funct import *
 
 
 def placement_input_entry(el, row):
@@ -19,36 +14,15 @@ def placement_output_entry(el, column, padx=(10, 0), pady=(10, 0)):
     return placement(element=el, row=i, column=column, padx=padx, pady=(0 if i == 0 else pady), ipady=4)
 
 
-def gen_value(cell):
-    input_value = [input_regex.search(el.get().replace(',', '')) for el in cell if el]
-    value = [float(vl.group()) if vl else 0 for vl in input_value]
-
-    return value
-
-
-def col_name(col):
-    col_name = ",".join(['"' + i + '"' for i in col])
-    return col_name
-
-
-def ques_input(col):
-    ques_input = ",".join(["?" for i in col])
-    return ques_input
-
-
-def gen_query(col, table):
-    query = 'INSERT INTO "{}" ('.format(table) + col_name(col) + ') VALUES (' + ques_input(col) + ')'
-    return query
-
-
-def r_p_input():
-    value = gen_value(r_p_value[0:-1])
+def r_p_input(regex_r_p):
+    value = gen_value(r_p_value[0:-1], regex_r_p)
 
     for i, vl in enumerate(value): value[i] = int(value[i])
 
     query = gen_query(r_p_name[0:-1], r_p_table)
 
-    cur.execute(query, ([i for i in value]))
+    if Counter(value)[0] != len(value):
+        cur.execute(query, ([i for i in value]))
 
     con.commit()
 
@@ -71,12 +45,13 @@ def for_cash(value):
             value[i] *= 1000
 
 
-def insert_input():
-    value = gen_value(input_entry)
+def insert_input(regex_input):
+    value = gen_value(input_entry, regex_input)
     for_cash(value)
     query = gen_query(input_name, table_name)
 
-    if Counter(value)[0] != len(value): cur.execute(query, ([i for i in value]))
+    if Counter(value)[0] != len(value):
+        cur.execute(query, ([i for i in value]))
 
     con.commit()
 
@@ -86,24 +61,16 @@ def sum_col(col, table, arr):
     arr.append(int(cur.fetchone()[0]))
 
 
-def insert_value(insert_cell, insert_vl):
-    insert_cell.insert(0, '{:,}'.format(insert_vl))
+def convert_readonly(element):
+    element.config(state='readonly')
 
 
-def insert_value_rp(insert_cell, insert_vl):
-    insert_cell.insert(0, insert_vl)
+def convert_normal(element):
+    element.config(state='normal')
 
 
-def convert_readonly(el):
-    el.config(state='readonly')
-
-
-def convert_normal(el):
-    el.config(state='normal')
-
-
-def delete_value(el):
-    el.delete(0, tkinter.END)
+def delete_value(element):
+    element.delete(0, tkinter.END)
 
 
 def convert_readonly_el():
@@ -199,8 +166,8 @@ def reset():
 
 
 def submit():
-    insert_input()
-    r_p_input()
+    insert_input(input_regex)
+    r_p_input(input_regex)
 
     try:
         total()
@@ -408,8 +375,8 @@ if __name__ == "__main__":
                 insert_value(el, int(search_value[i]))
 
 
-    def update():
-        value = gen_value(input_entry)
+    def update(regex_update):
+        value = gen_value(input_entry, regex_update)
         for_cash(value)
 
         for i in range(len(input_name)):
@@ -419,6 +386,8 @@ if __name__ == "__main__":
             con.commit()
         total()
 
+    def update_arg():
+        update(input_regex)
 
     def previous_entry():
         global search_id_vl
@@ -454,7 +423,7 @@ if __name__ == "__main__":
                                    cursor="hand2", image=img_search)
     placement(element=search_button, row=0, column=0, padx=(60, 0), pady=(0, 0), ipady=2, columnspan=6)
 
-    update_button = tkinter.Button(input_frame, text="", compound=tkinter.LEFT, command=update, width=45, height=41,
+    update_button = tkinter.Button(input_frame, text="", compound=tkinter.LEFT, command=update_arg, width=45, height=41,
                                    bg='#eaeaea', cursor="hand2", image=img_update)
     placement(element=update_button, row=0, column=0, padx=(120, 0), pady=(0, 0), ipady=2, columnspan=6)
 
