@@ -5,7 +5,7 @@ from collections import Counter
 from datetime import date
 from funct import *
 
-
+          
 def placement_input_entry(el, row):
     return placement(element=el, row=row, column=i, pady=(10, 0), ipady=2, relief='sunken')
 
@@ -14,19 +14,10 @@ def placement_output_entry(el, column, padx=(10, 0), pady=(10, 0)):
     return placement(element=el, row=i, column=column, padx=padx, pady=(0 if i == 0 else pady), ipady=4)
 
 
-def r_p_input(regex_r_p):
-    value = gen_value(r_p_value[0:-1], regex_r_p)
+def r_p_input():    
+    save_transaction(input_regex, r_p_value[0:-1], r_p_name[0:-1], r_p_table, cur, con,1,0)
 
-    for i, vl in enumerate(value): value[i] = int(value[i])
-
-    query = gen_query(r_p_name[0:-1], r_p_table)
-
-    if Counter(value)[0] != len(value):
-        cur.execute(query, ([i for i in value]))
-
-    con.commit()
-
-
+ 
 def r_p_input_init():
     query = gen_query(r_p_name[0:-1], r_p_table)
 
@@ -35,42 +26,19 @@ def r_p_input_init():
     con.commit()
 
 
-def for_cash(value):
-    for i, vl in enumerate(value):
+def insert_input():
+     for i in enumerate(input_entry):
         if i in range(4) or not (thousand_shorthand_var.get()):
-            value[i] = int(value[i])
-
-    if thousand_shorthand_var.get():
-        for i in range(4, len(value)):
-            value[i] *= 1000
-
-
-def insert_input(regex_input):
-    value = gen_value(input_entry, regex_input)
-    for_cash(value)
-    query = gen_query(input_name, table_name)
-
-    if Counter(value)[0] != len(value):
-        cur.execute(query, ([i for i in value]))
-
-    con.commit()
-
+            cv_int=1
+        else:
+            cv_int=0
+        
+     save_transaction(input_regex, input_entry,  input_name, table_name,cur, con,cv_int,thousand_shorthand_var.get())
+    
 
 def sum_col(col, table, arr):
     cur.execute('SELECT sum("{}") FROM "{}"'.format(col, table))
     arr.append(int(cur.fetchone()[0]))
-
-
-def convert_readonly(element):
-    element.config(state='readonly')
-
-
-def convert_normal(element):
-    element.config(state='normal')
-
-
-def delete_value(element):
-    element.delete(0, tkinter.END)
 
 
 def convert_readonly_el():
@@ -104,9 +72,11 @@ def total():
     input_name_cash = input1_name[0:4] + input2_name[4:6]
 
     # Query
-    for name in input_name_part: sum_col(name, table_name, Total)
+    for name in input_name_part:
+        sum_col(name, table_name, Total)
 
-    for name in input_name_cash: sum_col(name, table_name, Cash)
+    for name in input_name_cash:
+        sum_col(name, table_name, Cash)
 
     cur.execute('SELECT * FROM "{}" ORDER BY "ID" DESC LIMIT 1'.format(r_p_table))
     try:
@@ -115,10 +85,12 @@ def total():
         print("No Entry To Sum1")
 
     # Cash Details
-    for ii, i in enumerate(range(2, 5)): cash_label[i].config(text=cash_detail[ii] + str(Cash[ii]))
+    for ii, i in enumerate(range(2, 5)):
+        cash_label[i].config(text=cash_detail[ii] + str(Cash[ii]))
 
     # Cash Adjustmaent
-    for i, vl in enumerate(Cash_type): Cash[i] = Cash[i] * vl
+    for i, vl in enumerate(Cash_type):
+        Cash[i] = Cash[i] * vl
 
     # Gross Value
     Total_Hand = sum(Total[0:2])
@@ -166,8 +138,9 @@ def reset():
 
 
 def submit():
-    insert_input(input_regex)
-    r_p_input(input_regex)
+    insert_input()
+    r_p_input()
+    
 
     try:
         total()
@@ -421,27 +394,28 @@ if __name__ == "__main__":
 
     search_button = tkinter.Button(input_frame, text="Search", command=last_entry, width=45, height=41, bg='#eaeaea',
                                    cursor="hand2", image=img_search)
-    placement(element=search_button, row=0, column=0, padx=(60, 0), pady=(0, 0), ipady=2, columnspan=6)
-
-    update_button = tkinter.Button(input_frame, text="", compound=tkinter.LEFT, command=update_arg, width=45, height=41,
-                                   bg='#eaeaea', cursor="hand2", image=img_update)
-    placement(element=update_button, row=0, column=0, padx=(120, 0), pady=(0, 0), ipady=2, columnspan=6)
-
+    
     previous_button = tkinter.Button(input_frame, text="Previous", command=previous_entry, width=45, height=41,
                                      bg='#eaeaea', cursor="hand2", image=img_previous)
-    placement(element=previous_button, row=0, column=0, padx=(180, 0), pady=(0, 0), ipady=2, columnspan=6)
-
+    
     next_button = tkinter.Button(input_frame, text="Next", command=next_entry, width=45, height=41, bg='#eaeaea',
                                  cursor="hand2", image=img_next)
-    placement(element=next_button, row=0, column=0, padx=(240, 0), pady=(0, 0), ipady=2, columnspan=6)
 
     refresh_button = tkinter.Button(input_frame, text="Refresh", command=total, width=45, height=41, bg='#eaeaea',
                                     cursor="hand2", image=img_refresh)
-    placement(element=refresh_button, row=0, column=0, padx=(300, 0), pady=(0, 15), ipady=2, columnspan=6)
 
-    refresh_button = tkinter.Button(input_frame, text="Refresh", command=total, width=45, height=41, bg='#eaeaea',
+    delete_button = tkinter.Button(input_frame, text="Refresh", command=total, width=45, height=41, bg='#eaeaea',
                                     cursor="hand2", image=img_delete)
-    placement(element=refresh_button, row=0, column=0, padx=(360, 0), pady=(0, 15), ipady=2, columnspan=6)
+
+    update_button = tkinter.Button(input_frame, text="", compound=tkinter.LEFT, command=update_arg, width=45, height=41,
+                                   bg='#eaeaea', cursor="hand2", image=img_update)
+    
+    placement(element=search_button, row=0, column=0, padx=(60, 0), pady=(0, 0), ipady=2, columnspan=6)
+    placement(element=update_button, row=0, column=0, padx=(120, 0), pady=(0, 0), ipady=2, columnspan=6)
+    placement(element=previous_button, row=0, column=0, padx=(180, 0), pady=(0, 0), ipady=2, columnspan=6)
+    placement(element=next_button, row=0, column=0, padx=(240, 0), pady=(0, 0), ipady=2, columnspan=6)
+    placement(element=refresh_button, row=0, column=0, padx=(300, 0), pady=(0, 15), ipady=2, columnspan=6)   
+    placement(element=delete_button, row=0, column=0, padx=(360, 0), pady=(0, 15), ipady=2, columnspan=6)
 
     try:
         total()

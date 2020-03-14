@@ -1,4 +1,8 @@
-
+import tkinter
+import re
+import sqlite3
+from collections import Counter
+from datetime import date
 
 def placement(element, row=0, column=0, sticky='nw', padx=(10, 0), pady=(0, 0), ipady=0, columnspan=1,
                                                                                                                                               border=2, relief='groove'):
@@ -35,3 +39,35 @@ def insert_value(insert_cell, insert_vl):
 
 def insert_value_rp(insert_cell, insert_vl):
     insert_cell.insert(0, insert_vl)
+
+
+def save_transaction(regx, cell, col, table,cursor, connection,convert_int, thousand_shorthand):
+    
+    value = gen_value(cell, regx)
+
+    for i, vl in enumerate(value):
+        if convert_int:
+            value[i] = int(value[i])
+
+    if thousand_shorthand:
+        for i in range(4, len(value)):
+            value[i] *= 1000
+    
+    query = gen_query(col, table)
+
+    if Counter(value)[0] != len(value):
+        cursor.execute(query, ([i for i in value]))
+
+    connection.commit()
+
+def convert_readonly(element):
+    element.config(state='readonly')
+
+
+def convert_normal(element):
+    element.config(state='normal')
+
+
+def delete_value(element):
+    element.delete(0, tkinter.END)
+    
