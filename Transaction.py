@@ -245,19 +245,18 @@ if __name__ == "__main__":
     submit_button = tkinter.Button(input_frame, text="Submit", width=10, height=1, command=submit, bg='#1891ac',
                                    fg='white', cursor="hand2")
 
+    def colorize(els, clr):
+        for el in els:
+            el.config(bg=clr)
+        
     # Color
-    for el in input_button1 + input_button2:
-        el.config(bg=color[1])
-    for el in input_entry1 + input_entry2:
-        el.config(bg=color[2])
-    for el in output_label1:
-        el.config(bg=color[3])
-    for el in output_label2:
-        el.config(bg=color[4])
-    for el in cash_label:
-        el.config(bg=color[5])
-    for el in r_p_label:
-        el.config(bg=color[1])
+    colorize(input_button1 + input_button2, color[1])
+    colorize(input_entry1 + input_entry2, color[2])
+    colorize(output_label1, color[3])
+    colorize(output_label2, color[4])
+    colorize(cash_label, color[5])
+    colorize(r_p_label, color[1])
+   
 
     input_name = input1_name + input2_name
     input_entry = input_entry1 + input_entry2
@@ -356,8 +355,8 @@ if __name__ == "__main__":
                 insert_value(el, int(search_value[i]))
 
 
-    def update(regex_update):
-        value = gen_value(input_entry, regex_update)
+    def update_vl():
+        value = gen_value(input_entry, input_regex)
         for_cash(value)
 
         for i in range(len(input_name)):
@@ -367,8 +366,6 @@ if __name__ == "__main__":
             con.commit()
         total()
 
-    def update_arg():
-        update(input_regex)
 
     def previous_entry():
         global search_id_vl
@@ -399,31 +396,19 @@ if __name__ == "__main__":
     img_next = tkinter.PhotoImage(file="icon/Next-icon.png")
     img_refresh = tkinter.PhotoImage(file="icon/Refresh-icon.png")
     img_delete = tkinter.PhotoImage(file="icon/Delete-icon.png")
+ 
 
-    search_button = tkinter.Button(input_frame, text="Search", command=last_entry, width=45, height=41, bg='#eaeaea',
-                                   cursor="hand2", image=img_search)
+    def icon_btn(cmd, img):
+        return tkinter.Button(input_frame, command=cmd, width=45, height=41, bg='#eaeaea', cursor="hand2", image=img)
     
-    previous_button = tkinter.Button(input_frame, text="Previous", command=previous_entry, width=45, height=41,
-                                     bg='#eaeaea', cursor="hand2", image=img_previous)
+    btn_cmd= [last_entry, update_vl, previous_entry, next_entry, total, total]
+    btn_img= [img_search, img_update, img_previous, img_next, img_refresh, img_delete]
     
-    next_button = tkinter.Button(input_frame, text="Next", command=next_entry, width=45, height=41, bg='#eaeaea',
-                                 cursor="hand2", image=img_next)
+    btn_list = [icon_btn(icon_cmd, icon_img) for icon_cmd,icon_img in list(zip(btn_cmd, btn_img))]
 
-    refresh_button = tkinter.Button(input_frame, text="Refresh", command=total, width=45, height=41, bg='#eaeaea',
-                                    cursor="hand2", image=img_refresh)
+    for i, el in enumerate(btn_list):
+        placement(element=btn_list[i], row=0, column=0, padx=((60*(i+1)), 0), pady=(0, 15), ipady=2, columnspan=6)
 
-    delete_button = tkinter.Button(input_frame, text="Refresh", command=total, width=45, height=41, bg='#eaeaea',
-                                    cursor="hand2", image=img_delete)
-
-    update_button = tkinter.Button(input_frame, text="", compound=tkinter.LEFT, command=update_arg, width=45, height=41,
-                                   bg='#eaeaea', cursor="hand2", image=img_update)
-    
-    placement(element=search_button, row=0, column=0, padx=(60, 0), pady=(0, 0), ipady=2, columnspan=6)
-    placement(element=update_button, row=0, column=0, padx=(120, 0), pady=(0, 0), ipady=2, columnspan=6)
-    placement(element=previous_button, row=0, column=0, padx=(180, 0), pady=(0, 0), ipady=2, columnspan=6)
-    placement(element=next_button, row=0, column=0, padx=(240, 0), pady=(0, 0), ipady=2, columnspan=6)
-    placement(element=refresh_button, row=0, column=0, padx=(300, 0), pady=(0, 15), ipady=2, columnspan=6)   
-    placement(element=delete_button, row=0, column=0, padx=(360, 0), pady=(0, 15), ipady=2, columnspan=6)
 
     try:
         total()
