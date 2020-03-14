@@ -13,7 +13,15 @@ def placement_input_entry(el, row):
 def placement_output_entry(el, column, padx=(10, 0), pady=(10, 0)):
     return placement(element=el, row=i, column=column, padx=padx, pady=(0 if i == 0 else pady), ipady=4)
 
+def for_cash(value):
+    for i, vl in enumerate(value):
+        if i in range(4) or not (thousand_shorthand_var.get()):
+            value[i] = int(value[i])
 
+    if thousand_shorthand_var.get():
+        for i in range(4, len(value)):
+            value[i] *= 1000
+            
 def r_p_input():    
     save_transaction(input_regex, r_p_value[0:-1], r_p_name[0:-1], r_p_table, cur, con,1,0)
 
