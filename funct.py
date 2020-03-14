@@ -4,8 +4,7 @@ import sqlite3
 from collections import Counter
 from datetime import date
 
-def placement(element, row=0, column=0, sticky='nw', padx=(10, 0), pady=(0, 0), ipady=0, columnspan=1,
-                                                                                                                                              border=2, relief='groove'):
+def placement(element, row=0, column=0, sticky='nw', padx=(10, 0), pady=(0, 0), ipady=0, columnspan=1,                                                                                                                                             border=2, relief='groove'):
     
     element.grid(row=row, column=column, sticky=sticky, padx=padx, pady=pady, ipady=ipady, columnspan=columnspan)
     element.config(border=border, relief=relief)

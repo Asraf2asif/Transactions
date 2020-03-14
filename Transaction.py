@@ -5,7 +5,7 @@ from collections import Counter
 from datetime import date
 from funct import *
 
-          
+
 def placement_input_entry(el, row):
     return placement(element=el, row=row, column=i, pady=(10, 0), ipady=2, relief='sunken')
 
@@ -25,7 +25,7 @@ def for_cash(value):
 def r_p_input():    
     save_transaction(input_regex, r_p_value[0:-1], r_p_name[0:-1], r_p_table, cur, con,1,0)
 
- 
+
 def r_p_input_init():
     query = gen_query(r_p_name[0:-1], r_p_table)
 
@@ -35,13 +35,13 @@ def r_p_input_init():
 
 
 def insert_input():
-     for i in enumerate(input_entry):
+    for i in enumerate(input_entry):
         if i in range(4) or not (thousand_shorthand_var.get()):
             cv_int=1
         else:
             cv_int=0
         
-     save_transaction(input_regex, input_entry,  input_name, table_name,cur, con,cv_int,thousand_shorthand_var.get())
+    save_transaction(input_regex, input_entry,  input_name, table_name,cur, con,cv_int,thousand_shorthand_var.get())
     
 
 def sum_col(col, table, arr):
@@ -113,9 +113,9 @@ def total():
 
     # Insert Value
     insert_name = {cash_value[0]: Cash[4], cash_value[1]: Cash[5], cash_value[6]: Total_Cash,
-                   output_value1[2]: Total_Cash, output_value1[3]: Total_Hand, output_value2[0]: r_p_closing,
-                   output_value2[5]: Total_Comp,
-                   balance_value: Total_Hand - Total_Comp}
+                output_value1[2]: Total_Cash, output_value1[3]: Total_Hand, output_value2[0]: r_p_closing,
+                output_value2[5]: Total_Comp,
+                balance_value: Total_Hand - Total_Comp}
 
     for i in range(2):
         if Total[i] != 0:
@@ -237,13 +237,13 @@ if __name__ == "__main__":
 
     thousand_shorthand_var = tkinter.IntVar()
     thousand_shorthand = tkinter.Checkbutton(input_frame, text="(000)?", variable=thousand_shorthand_var, bg=color[5],
-                                             cursor="hand2")
+                                            cursor="hand2")
 
     balance_button = tkinter.Button(output_frame, text="Balance", width=11, anchor="w", bg='#f3f798', cursor="hand2")
     balance_value = tkinter.Entry(output_frame, width=12, justify='center', state='readonly', **styleBold)
 
     submit_button = tkinter.Button(input_frame, text="Submit", width=10, height=1, command=submit, bg='#1891ac',
-                                   fg='white', cursor="hand2")
+                                fg='white', cursor="hand2")
 
     def colorize(els, clr):
         for el in els:
@@ -256,7 +256,7 @@ if __name__ == "__main__":
     colorize(output_label2, color[4])
     colorize(cash_label, color[5])
     colorize(r_p_label, color[1])
-   
+
 
     input_name = input1_name + input2_name
     input_entry = input_entry1 + input_entry2
@@ -396,7 +396,7 @@ if __name__ == "__main__":
     img_next = tkinter.PhotoImage(file="icon/Next-icon.png")
     img_refresh = tkinter.PhotoImage(file="icon/Refresh-icon.png")
     img_delete = tkinter.PhotoImage(file="icon/Delete-icon.png")
- 
+
 
     def icon_btn(cmd, img):
         return tkinter.Button(input_frame, command=cmd, width=45, height=41, bg='#eaeaea', cursor="hand2", image=img)
